@@ -31,6 +31,21 @@ public static class STRINGS
             public static LocString OPEN_BUTTON = "Insight Research";
         }
 
+        public static class TUTORIAL
+        {
+            public static LocString STAGE1_TITLE = "Insight Research Is Now Possible";
+            public static LocString STAGE1_BODY =
+                "Every technology has been researched. The research buildings have nothing left to work on, but the colony's research records are still worth something.\n\n" +
+                "Build a <b>Record Archive</b> (Equipment menu, Research tab). While it is powered, the colony's research output keeps turning into <b>Insight</b>.";
+            public static LocString STAGE2_TITLE = "The Record Archive Is Running";
+            public static LocString STAGE2_BODY =
+                "Research buildings keep working even though the research tree is complete, and their output is now turned into Insight.\n\n" +
+                "Insight is shown above the build menu. Open the <b>Insight</b> button on the research screen to see the details.";
+            public static LocString STAGE3_TITLE = "Expanding the Archive";
+            public static LocString STAGE3_BODY =
+                "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more.";
+        }
+
         public static class ARCHIVE
         {
             public static LocString SIDESCREEN_TITLE = "Record Archive";

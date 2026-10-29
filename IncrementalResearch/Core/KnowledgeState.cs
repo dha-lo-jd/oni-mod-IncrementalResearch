@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Runtime.Serialization;
 using Database;
+using IncrementalResearch.Ui;
 using KSerialization;
 
 namespace IncrementalResearch.Core;
@@ -18,6 +19,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private int scaleTier1;
     // Moving average of the weighted research output (points per second).
     [Serialize] private double baseRate;
+    // Number of tutorial dialogs already shown (see Ui/TutorialDialog).
+    [Serialize] private int tutorialStage;
 
     private BigInteger knowledge = BigInteger.Zero;
     private double knowledgeRemainder;
@@ -25,6 +28,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     private float researchCompleteCheckTimer;
     private bool researchComplete;
     private bool idleMode;
+    private bool tutorialDialogOpen;
 
     public BigInteger KnowledgeScaled => knowledge;
     public int ScaleTier1 => scaleTier1;
@@ -73,6 +77,12 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         {
             knowledge = BigInteger.Zero;
         }
+
+        // Saves from before the tutorial existed have already played through it.
+        if (tutorialStage == 0 && (scaleTier1 > 0 || knowledge > 0))
+        {
+            tutorialStage = TutorialDialog.StageCount;
+        }
     }
 
     public void RecordResearchPoints(string researchTypeId, float points)
@@ -101,6 +111,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public void Sim200ms(float dt)
     {
         UpdateResearchComplete(dt);
+        UpdateTutorial();
 
         var alpha = 1d - Math.Exp(-dt / KnowledgeRules.BaseRateTimeConstant);
         baseRate += (pendingPoints / dt - baseRate) * alpha;
@@ -128,6 +139,31 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         var whole = Math.Floor(exact);
         knowledgeRemainder = exact - whole;
         knowledge += new BigInteger(whole);
+    }
+
+    private void UpdateTutorial()
+    {
+        if (tutorialDialogOpen || tutorialStage >= TutorialDialog.StageCount)
+        {
+            return;
+        }
+
+        bool reached;
+        switch (tutorialStage)
+        {
+            case 0: reached = researchComplete; break;
+            case 1: reached = RecordArchive.AnyOperational; break;
+            default: reached = CanExpandTier1(); break;
+        }
+
+        if (!reached)
+        {
+            return;
+        }
+
+        tutorialDialogOpen = true;
+        TutorialDialog.Show(tutorialStage, () => tutorialDialogOpen = false);
+        tutorialStage++;
     }
 
     private void UpdateResearchComplete(float dt)
