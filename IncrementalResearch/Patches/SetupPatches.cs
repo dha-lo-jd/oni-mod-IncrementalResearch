@@ -16,9 +16,18 @@ public static class SaveGame_OnPrefabInit_Patch
 [HarmonyPatch(typeof(GeneratedBuildings), nameof(GeneratedBuildings.LoadGeneratedBuildings))]
 public static class GeneratedBuildings_LoadGeneratedBuildings_Patch
 {
+    private static bool added;
+
     public static void Prefix()
     {
-        ModUtil.AddBuildingToPlanScreen("Research", RecordArchiveConfig.ID);
+        // LoadGeneratedBuildings can run more than once; registering twice crashes the Codex.
+        if (added)
+        {
+            return;
+        }
+
+        added = true;
+        ModUtil.AddBuildingToPlanScreen("Equipment", RecordArchiveConfig.ID, "research");
     }
 }
 
