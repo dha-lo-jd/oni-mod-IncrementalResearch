@@ -63,3 +63,13 @@ public static class ResearchScreen_OnSpawn_Patch
         IncrementalResearch.Ui.IdleResearchTab.Create(__instance);
     }
 }
+
+// Adds the Insight readout above the build menu.
+[HarmonyPatch(typeof(PlanScreen), "OnSpawn")]
+public static class PlanScreen_OnSpawn_Patch
+{
+    public static void Postfix(PlanScreen __instance)
+    {
+        IncrementalResearch.Ui.InsightHud.Create(__instance);
+    }
+}

@@ -10,8 +10,10 @@ namespace IncrementalResearch.Ui;
 internal sealed class IdleResearchTab : MonoBehaviour
 {
     private const float RefreshInterval = 0.25f;
-    private const float PanelTopMargin = 56f;
+    // The panel covers the whole screen; its content starts below the toggle button.
+    private const float ContentTopMargin = 56f;
 
+    private ResearchScreen screen;
     private RectTransform host;
     private RectTransform sideBarRect;
     private RectTransform toggleRect;
@@ -31,12 +33,16 @@ internal sealed class IdleResearchTab : MonoBehaviour
 
     public static IdleResearchTab Instance { get; private set; }
 
+    // The panel only counts as open while the research screen itself is shown.
+    public bool IsOpen => panel != null && panel.activeSelf && screen != null && screen.IsScreenActive();
+
     public static void Create(ResearchScreen screen)
     {
         var host = UiFactory.CreateStretched("IdleResearchTab", screen.transform, 0f, 0f, 0f, 0f);
         var tab = host.gameObject.AddComponent<IdleResearchTab>();
         Instance = tab;
         tab.host = host;
+        tab.screen = screen;
         var sideBar = HarmonyLib.Traverse.Create(screen).Field("sideBar").GetValue<Component>();
         tab.sideBarRect = sideBar != null ? sideBar.transform as RectTransform : null;
         tab.Build(host);
@@ -59,20 +65,24 @@ internal sealed class IdleResearchTab : MonoBehaviour
         PlaceToggleButton();
 
         // Panel covering the tech tree.
-        var panelRect = UiFactory.CreateStretched("Panel", host, 0f, PanelTopMargin, 0f, 0f);
+        var panelRect = UiFactory.CreateStretched("Panel", host, 0f, 0f, 0f, 0f);
         var background = panelRect.gameObject.AddComponent<Image>();
         background.color = UiFactory.PanelColor;
         panel = panelRect.gameObject;
+        var content = UiFactory.CreateStretched("Content", panelRect, 0f, ContentTopMargin, 0f, 0f);
 
-        UiFactory.CreateLabel(panelRect, STRINGS.UI.TAB.TITLE, 40f, 30f, 600f, 40f, fontSize: 28f);
-        insightLabel = UiFactory.CreateLabel(panelRect, "", 40f, 90f, 600f, 30f, fontSize: 22f);
-        baseRateLabel = UiFactory.CreateLabel(panelRect, "", 40f, 125f, 600f, 30f);
-        statusLabel = UiFactory.CreateLabel(panelRect, "", 40f, 160f, 900f, 30f);
+        UiFactory.CreateLabel(content, STRINGS.UI.TAB.TITLE, 40f, 30f, 600f, 40f, fontSize: 28f);
+        insightLabel = UiFactory.CreateLabel(content, "", 40f, 90f, 600f, 30f, fontSize: 22f);
+        baseRateLabel = UiFactory.CreateLabel(content, "", 40f, 125f, 600f, 30f);
+        statusLabel = UiFactory.CreateLabel(content, "", 40f, 160f, 900f, 30f);
 
-        UiFactory.CreateLabel(panelRect, STRINGS.UI.ARCHIVE.SIDESCREEN_TITLE, 40f, 230f, 600f, 34f, fontSize: 22f);
-        unitLabel = UiFactory.CreateLabel(panelRect, "", 60f, 270f, 600f, 30f);
-        productionLabel = UiFactory.CreateLabel(panelRect, "", 60f, 305f, 600f, 30f);
-        expandButton = UiFactory.CreateButton(panelRect, "", 60f, 350f, 460f, 40f, Expand, out expandLabel);
+        UiFactory.CreateLabel(content, STRINGS.UI.ARCHIVE.SIDESCREEN_TITLE, 40f, 230f, 600f, 34f, fontSize: 22f);
+        unitLabel = UiFactory.CreateLabel(content, "", 60f, 270f, 600f, 30f);
+        productionLabel = UiFactory.CreateLabel(content, "", 60f, 305f, 600f, 30f);
+        expandButton = UiFactory.CreateButton(content, "", 60f, 350f, 460f, 40f, Expand, out expandLabel);
+
+        // The button stays above the panel.
+        toggleRect.SetAsLastSibling();
 
         panel.SetActive(false);
         toggleButton.SetActive(false);

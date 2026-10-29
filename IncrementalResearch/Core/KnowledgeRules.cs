@@ -28,6 +28,7 @@ public static class KnowledgeRules
         {
             case "basic": return 1f;
             case "advanced": return 2f;
+            case "nuclear": return 3f;
             default: return 0f;
         }
     }

@@ -102,3 +102,7 @@ msgstr "知見の研究中"
 msgctxt "IncrementalResearch.STRINGS.UI.SIDE.OPEN_BUTTON"
 msgid "Insight Research"
 msgstr "知見の研究"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.TEXT"
+msgid "Insight: {0} (+{1}/s)"
+msgstr "知見: {0} (+{1}/秒)"

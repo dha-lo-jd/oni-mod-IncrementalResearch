@@ -36,16 +36,13 @@ public static class ResearchSideScreen_RefreshDisplayState_Patch
     }
 }
 
-// Opening the research screen any other way shows the tech tree.
+// The research screen always opens on the tech tree, and closing it closes the Insight tab.
 [HarmonyPatch(typeof(ResearchScreen), nameof(ResearchScreen.Show))]
 public static class ResearchScreen_Show_Patch
 {
-    public static void Postfix(bool show)
+    public static void Postfix()
     {
-        if (show)
-        {
-            IdleResearchTab.Instance?.SetOpen(false);
-        }
+        IdleResearchTab.Instance?.SetOpen(false);
     }
 }
 

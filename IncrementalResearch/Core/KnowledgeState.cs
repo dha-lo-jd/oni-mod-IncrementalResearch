@@ -160,6 +160,11 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             {
                 researchCenter.Trigger((int)GameHashes.ResearchPointsChanged);
             }
+            else if (center is NuclearResearchCenter nuclearCenter)
+            {
+                // Its state machine only re-evaluates the selected research on this event.
+                nuclearCenter.Trigger((int)GameHashes.ActiveResearchChanged);
+            }
         }
     }
 }

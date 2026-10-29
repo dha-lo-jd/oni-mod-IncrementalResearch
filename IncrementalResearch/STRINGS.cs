@@ -20,6 +20,11 @@ public static class STRINGS
             public static LocString PRODUCTION = "Production: {0}/s";
         }
 
+        public static class HUD
+        {
+            public static LocString TEXT = "Insight: {0} (+{1}/s)";
+        }
+
         public static class SIDE
         {
             public static LocString HEADER = "Insight research in progress";
