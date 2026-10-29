@@ -37,7 +37,7 @@
   - ステーションが生んだ研究ポイント(`ResearchCenter.ConvertMassToResearchPoints` が `Research.AddResearchPoints` に渡す値)を、種類(`research_point_type_id`)ごとに集計する。
   - 腕前(`AttributeConverters.ResearchSpeed`)は、研究ポイントの生産量に既に反映されているので、別に掛けない。
 - S は直近の集計の指数移動平均(時定数 1サイクル=600秒、調整可)の「研究ポイント/秒」とし、種類ごとの重みを掛けて合算する。
-  - 重みの初期値: basic=1、advanced=2、nuclear=3、それ以外は未使用(調整可)。
+  - 重みの初期値: basic=1、advanced=2、nuclear=3、space(宇宙研究)=4、orbital(軌道研究)=4、それ以外は未使用(調整可)。
 - 研究が止まれば S も下がり、知見の伸びも落ちる(コロニーが供給する土台、という構想どおり)。
 
 ### 研究完了後の遊休運転

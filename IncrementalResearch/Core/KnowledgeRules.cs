@@ -29,6 +29,8 @@ public static class KnowledgeRules
             case "basic": return 1f;
             case "advanced": return 2f;
             case "nuclear": return 3f;
+            case "space": return 4f;
+            case "orbital": return 4f;
             default: return 0f;
         }
     }
