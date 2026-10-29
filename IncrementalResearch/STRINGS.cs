@@ -7,6 +7,25 @@ public static class STRINGS
     {
         public static LocString TITLE = "Incremental Research";
 
+        public static class TAB
+        {
+            public static LocString OPEN = "Insight";
+            public static LocString CLOSE = "Research Tree";
+            public static LocString TITLE = "Insight";
+            public static LocString INSIGHT = "Insight: {0}";
+            public static LocString BASE_RATE = "Base rate: {0}/s";
+            public static LocString STATUS_ACTIVE = "Record Archive is running. Research buildings keep working after all research is complete.";
+            public static LocString STATUS_INACTIVE = "No powered Record Archive. Insight is not being produced.";
+            public static LocString UNIT_VALUE = "{0}: {1}";
+            public static LocString PRODUCTION = "Production: {0}/s";
+        }
+
+        public static class SIDE
+        {
+            public static LocString HEADER = "Insight research in progress";
+            public static LocString OPEN_BUTTON = "Insight Research";
+        }
+
         public static class ARCHIVE
         {
             public static LocString SIDESCREEN_TITLE = "Record Archive";

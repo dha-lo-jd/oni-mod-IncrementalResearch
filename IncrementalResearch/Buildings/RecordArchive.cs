@@ -10,6 +10,8 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
 
     [MyCmpGet] private Operational operational;
 
+    public static bool AnyExists => Instances.Count > 0;
+
     public static bool AnyOperational
     {
         get
@@ -52,7 +54,7 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
             return state == null
                 ? ""
                 : string.Format(STRINGS.UI.ARCHIVE.EXPAND_BUTTON, STRINGS.UI.ARCHIVE.UNIT,
-                    FormatNumber(state.NextScaleCostTier1));
+                    NumberFormat.FormatScaled(state.NextExpansionCostScaled));
         }
     }
 
@@ -63,9 +65,9 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
             var state = KnowledgeState.Instance;
             return state == null
                 ? ""
-                : string.Format(STRINGS.UI.ARCHIVE.STATUS_TOOLTIP, FormatNumber(state.Knowledge),
-                    FormatNumber(state.BaseRate), state.ScaleTier1, STRINGS.UI.ARCHIVE.UNIT,
-                    FormatNumber(state.ProductionTier1));
+                : string.Format(STRINGS.UI.ARCHIVE.STATUS_TOOLTIP, NumberFormat.FormatScaled(state.KnowledgeScaled),
+                    NumberFormat.Format(state.BaseRate), state.HoldingsTier1, STRINGS.UI.ARCHIVE.UNIT,
+                    NumberFormat.Format(state.ProductionTier1));
         }
     }
 
@@ -98,10 +100,5 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
     public int ButtonSideScreenSortOrder()
     {
         return 20;
-    }
-
-    private static string FormatNumber(double value)
-    {
-        return value >= 1e6 ? value.ToString("0.###e+0") : value.ToString("0.##");
     }
 }

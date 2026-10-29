@@ -58,3 +58,47 @@ msgstr ""
 "電力が供給されている間、コロニーの研究成果から知見を生み出します。\n"
 "\n"
 "すべての研究が完了した後も、研究設備を稼働させ続けます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.OPEN"
+msgid "Insight"
+msgstr "知見"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.CLOSE"
+msgid "Research Tree"
+msgstr "研究ツリー"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.TITLE"
+msgid "Insight"
+msgstr "知見"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.INSIGHT"
+msgid "Insight: {0}"
+msgstr "知見: {0}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.BASE_RATE"
+msgid "Base rate: {0}/s"
+msgstr "基礎速度: {0}/秒"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.STATUS_ACTIVE"
+msgid "Record Archive is running. Research buildings keep working after all research is complete."
+msgstr "記録保管庫が稼働中です。すべての研究が完了した後も、研究設備は稼働し続けます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.STATUS_INACTIVE"
+msgid "No powered Record Archive. Insight is not being produced."
+msgstr "電力が供給された記録保管庫がありません。知見は生産されていません。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.UNIT_VALUE"
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TAB.PRODUCTION"
+msgid "Production: {0}/s"
+msgstr "生産量: {0}/秒"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SIDE.HEADER"
+msgid "Insight research in progress"
+msgstr "知見の研究中"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SIDE.OPEN_BUTTON"
+msgid "Insight Research"
+msgstr "知見の研究"

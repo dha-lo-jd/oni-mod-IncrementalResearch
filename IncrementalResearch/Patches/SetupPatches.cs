@@ -53,3 +53,13 @@ public static class TechItems_IsTechItemComplete_Patch
         }
     }
 }
+
+// Adds the idle research tab to the research screen.
+[HarmonyPatch(typeof(ResearchScreen), "OnSpawn")]
+public static class ResearchScreen_OnSpawn_Patch
+{
+    public static void Postfix(ResearchScreen __instance)
+    {
+        IncrementalResearch.Ui.IdleResearchTab.Create(__instance);
+    }
+}
