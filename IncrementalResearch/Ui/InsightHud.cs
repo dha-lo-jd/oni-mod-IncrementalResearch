@@ -77,8 +77,12 @@ internal sealed class InsightHud : MonoBehaviour
             return;
         }
 
-        label.text = string.Format(STRINGS.UI.HUD.TEXT, NumberFormat.FormatScaled(state.KnowledgeScaled),
-            NumberFormat.Format(state.ProductionTier1));
+        var knowledge = NumberFormat.FormatScaled(state.KnowledgeScaled);
+        var production = NumberFormat.Format(state.ProductionTier1);
+        // Meta-Insight is only mentioned once the colony has some.
+        label.text = state.MetaInsightEarned > 0
+            ? string.Format(STRINGS.UI.HUD.TEXT_MI, knowledge, production, NumberFormat.FormatWhole(state.MetaInsight))
+            : string.Format(STRINGS.UI.HUD.TEXT, knowledge, production);
         Place();
     }
 

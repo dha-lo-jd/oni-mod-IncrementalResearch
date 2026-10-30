@@ -222,3 +222,147 @@ msgstr "アップグレード"
 msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE4_BODY"
 msgid "An upgrade is now within reach. Open the Insight tab on the research screen: upgrades add multipliers and other effects, and each can be bought only once. Upgrades cost Insight too, so weigh them against the next expansion."
 msgstr "アップグレードを購入できるようになりました。研究画面の知見タブを開いてください。アップグレードは倍率などの効果を足すもので、それぞれ1回だけ購入できます。アップグレードにも知見がかかるので、次の拡張とどちらを優先するか考えてみてください。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.BUY_MI"
+msgid "Buy ({0} MI)"
+msgstr "購入(MI {0})"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_HEADSTART.NAME"
+msgid "Accumulated Foundations"
+msgstr "蓄積された基礎"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_HEADSTART.DESC"
+msgid "After a paradigm shift, start with 100 Insight."
+msgstr "パラダイムシフトのあと、知見100から始まる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_DISCOUNT.NAME"
+msgid "Inherited Index"
+msgstr "索引の継承"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_DISCOUNT.DESC"
+msgid "Base cost of Insight expansions x0.5."
+msgstr "知見の拡張の基準コストが半分になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_AUTO_UPGRADE.NAME"
+msgid "Routine Purchasing"
+msgstr "購入の定型化"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_AUTO_UPGRADE.DESC"
+msgid "Automatically buys affordable Insight upgrades."
+msgstr "買える知見のアップグレードを自動で購入する。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.TEXT_MI"
+msgid "Insight: {0} (+{1}/s)  MI: {2}"
+msgstr "知見: {0} (+{1}/秒)  MI: {2}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.HEADER"
+msgid "Paradigm Shift"
+msgstr "パラダイムシフト"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.MI_LINE"
+msgid "Meta-Insight: {0} (earned {1}, production x{2})"
+msgstr "メタ知見: {0}(累計 {1}、生産 ×{2})"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.PRODUCED"
+msgid "Insight produced this cycle: {0}"
+msgstr "この周回で生産した知見: {0}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.GAIN_NONE"
+msgid "Produce {0} Insight in one cycle to earn Meta-Insight."
+msgstr "メタ知見を得るには、1周回で知見を {0} 生産する必要がある。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.SHIFT_BUTTON"
+msgid "Paradigm Shift (+{0} MI)"
+msgstr "パラダイムシフト(+{0} MI)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.MI_UNIT"
+msgid "Theories"
+msgstr "理論数"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.MI_EXPAND_BUTTON"
+msgid "Build theories to increase {0} ({1} MI)"
+msgstr "理論を積んで{0}を増やす({1} MI)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.CONFIRM_TITLE"
+msgid "Paradigm Shift"
+msgstr "パラダイムシフト"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.CONFIRM_GAIN"
+msgid "You will gain {0} MI."
+msgstr "{0} MI を獲得します。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.CONFIRM_RESET"
+msgid "Insight, Insight expansions and Insight upgrades are reset."
+msgstr "知見、知見の拡張、知見のアップグレードはリセットされます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.CONFIRM_KEEP"
+msgid "Meta-Insight and everything bought with it are kept."
+msgstr "メタ知見と、それで購入したものは残ります。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.CONFIRM_OK"
+msgid "Shift"
+msgstr "実行する"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE5_TITLE"
+msgid "Paradigm Shift"
+msgstr "パラダイムシフト"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE5_BODY"
+msgid "<i>It's time for a shift! (Not the work kind, and not the bit kind...)
+
+The pursuit of knowledge knows no limit, but you cannot explore above the summit of a mountain. You can still dive to the bottom of the sea. You can still head for distant, unexplored lands. The time for change has come. A new perspective will give rise to new challenges. Much will be lost, but the 'Meta-Insight' gained in exchange will help.</i>
+
+You have produced enough Insight for a paradigm shift. Shifting resets Insight, its expansions and its upgrades, and grants Meta-Insight: a separate currency that multiplies all production from then on, and can be spent on its own expansions and upgrades. The longer you wait before shifting, the more you earn, but with diminishing returns."
+msgstr "<i>シフトの時間です！(勤務でもビットでもなくて…)
+
+知への探究に限りはありませんが、山の頂上より上へ探検することはできません。それでも、海の底に潜ることはできます。遠く未開の地を目指すこともできます。変革の時です。新たな視点は新たな挑戦を生むでしょう。失うものも多いですが、引き換えに得る『メタ知見』が助けになることでしょう</i>
+
+パラダイムシフトに足りるだけの知見を生産しました。シフトすると、知見と、その拡張・アップグレードがリセットされ、メタ知見を得ます。メタ知見は別の通貨で、以後のすべての生産に倍率をかけるほか、専用の拡張とアップグレードに使えます。シフトまで長く待つほど多く得られますが、増え方は次第に緩やかになります。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.PICK"
+msgid "Next school:"
+msgstr "次の学派:"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.NONE"
+msgid "None"
+msgstr "なし"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.CURRENT"
+msgid "Current school: {0}"
+msgstr "現在の学派: {0}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.EXPERIMENTALISM.NAME"
+msgid "Experimentalism"
+msgstr "実験主義"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.EXPERIMENTALISM.DESC"
+msgid "Lower tiers (1-2) produce x1.5, upper tiers (3 and up) x0.8."
+msgstr "下位階層(1〜2)の生産 ×1.5、上位階層(3以降)の生産 ×0.8。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.THEORETICAL.NAME"
+msgid "Theoretical School"
+msgstr "理論主義"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.THEORETICAL.DESC"
+msgid "Upper tiers (3 and up) produce x1.5, lower tiers (1-2) x0.8."
+msgstr "上位階層(3以降)の生産 ×1.5、下位階層(1〜2)の生産 ×0.8。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.SYSTEMATIC.NAME"
+msgid "Systematism"
+msgstr "体系主義"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SCHOOLS.SYSTEMATIC.DESC"
+msgid "All tiers produce x1.2."
+msgstr "全階層の生産 ×1.2。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.PARADIGM.CONFIRM_SCHOOL"
+msgid "Next school: {0}"
+msgstr "次の学派: {0}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE6_TITLE"
+msgid "Schools of Thought"
+msgstr "学派"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE6_BODY"
+msgid "The colony has shifted often enough to form schools of thought. At each paradigm shift you can now choose a school for the next cycle: each favors some tiers of facilities over others. You may also choose none."
+msgstr "パラダイムシフトを何度も重ねて、コロニーに学派が生まれました。これからは、シフトのたびに次の周回の学派を選べます。学派ごとに、得意な階層の設備が違います。学派を選ばなくても構いません。"

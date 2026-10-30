@@ -24,8 +24,20 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private int tutorialStage;
     // Ids of the purchased upgrades, comma separated.
     [Serialize] private string upgradesText = "";
+    // Paradigm shift (see docs/spec-paradigm-shift.md). Big numbers are saved as text.
+    [Serialize] private string producedText = "0";
+    [Serialize] private string metaInsightText = "0";
+    [Serialize] private string metaInsightEarnedText = "0";
+    [Serialize] private int shiftCount;
+    [Serialize] private int scaleMi;
+    // Id of the school chosen at the last paradigm shift, empty for none.
+    [Serialize] private string schoolId = "";
 
     private BigInteger knowledge = BigInteger.Zero;
+    // Insight produced in the current cycle, in thousandths. Decides the Meta-Insight gained by a shift.
+    private BigInteger produced = BigInteger.Zero;
+    private BigInteger metaInsight = BigInteger.Zero;
+    private BigInteger metaInsightEarned = BigInteger.Zero;
     private double knowledgeRemainder;
     private float pendingPoints;
     private float researchCompleteCheckTimer;
@@ -39,12 +51,53 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     // The facility itself counts as the first unit; expansions add to it.
     public int HoldingsTier1 => scaleTier1 + 1;
     public double BaseRate => baseRate;
-    public double MultiplierTier1 => ProductionMultiplier(1);
+    public double MultiplierTier1 => ProductionMultiplier(1) * MetaInsightMultiplier * SchoolMultiplier(1);
+
+    public bool SchoolsUnlocked => shiftCount >= Schools.UnlockShifts;
+    public SchoolDef CurrentSchool => Schools.Find(schoolId);
+
+    public double SchoolMultiplier(int tier)
+    {
+        var school = CurrentSchool;
+        return school == null ? 1d : school.Multiplier(tier);
+    }
+
+    public BigInteger MetaInsight => metaInsight;
+    public BigInteger MetaInsightEarned => metaInsightEarned;
+    public int ShiftCount => shiftCount;
+    public int ScaleMi => scaleMi;
+    public BigInteger ProducedScaled => produced;
+
+    // Production multiplier from the Meta-Insight earned so far. Spending Meta-Insight does not lower it.
+    public double MetaInsightMultiplier =>
+        1d + (KnowledgeRules.MiMultiplierBase + KnowledgeRules.MiMultiplierPerExpansion * scaleMi) *
+        (double)metaInsightEarned;
+
+    public BigInteger MetaInsightGain => KnowledgeRules.MiGain(produced);
+    public bool CanShift => MetaInsightGain >= 1;
+    public BigInteger NextMiExpansionCost => KnowledgeRules.MiExpansionCost(scaleMi);
 
     public double ProductionTier1 =>
         RecordArchive.AnyOperational ? baseRate * HoldingsTier1 * MultiplierTier1 : 0d;
 
-    public BigInteger NextExpansionCostScaled => KnowledgeRules.ExpansionCost(scaleTier1, ExpansionCostGrowth);
+    public BigInteger NextExpansionCostScaled => KnowledgeRules.ExpansionCost(scaleTier1, ExpansionCostGrowth, ExpansionCostFactor);
+
+    private double ExpansionCostFactor
+    {
+        get
+        {
+            var factor = 1d;
+            foreach (var def in Upgrades.All)
+            {
+                if (def.Effect == UpgradeEffect.ExpansionCostMultiplier && HasUpgrade(def.Id))
+                {
+                    factor *= def.Value;
+                }
+            }
+
+            return factor;
+        }
+    }
 
     public double ExpansionCostGrowth
     {
@@ -67,7 +120,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public bool IdleMode => idleMode;
 
     // The Insight tab is shown once the research tree is complete or the idle game has been touched.
-    public bool Unlocked => researchComplete || knowledge > 0 || scaleTier1 > 0 || RecordArchive.AnyExists;
+    public bool Unlocked => researchComplete || knowledge > 0 || scaleTier1 > 0 || shiftCount > 0 ||
+                            RecordArchive.AnyExists;
 
     protected override void OnPrefabInit()
     {
@@ -90,6 +144,9 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     {
         knowledgeText = knowledge.ToString();
         upgradesText = string.Join(",", upgrades);
+        producedText = produced.ToString();
+        metaInsightText = metaInsight.ToString();
+        metaInsightEarnedText = metaInsightEarned.ToString();
     }
 
     [OnDeserialized]
@@ -98,6 +155,21 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         if (!BigInteger.TryParse(knowledgeText, out knowledge))
         {
             knowledge = BigInteger.Zero;
+        }
+
+        if (!BigInteger.TryParse(producedText, out produced))
+        {
+            produced = BigInteger.Zero;
+        }
+
+        if (!BigInteger.TryParse(metaInsightText, out metaInsight))
+        {
+            metaInsight = BigInteger.Zero;
+        }
+
+        if (!BigInteger.TryParse(metaInsightEarnedText, out metaInsightEarned))
+        {
+            metaInsightEarned = BigInteger.Zero;
         }
 
         upgrades.Clear();
@@ -139,16 +211,21 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         return result;
     }
 
-    // Visible once the tier has been expanded enough and the required upgrade has been bought.
+    private BigInteger Balance(UpgradeCurrency currency)
+    {
+        return currency == UpgradeCurrency.Insight ? knowledge : metaInsight;
+    }
+
+    // Visible once the tier has been expanded and the colony has shifted enough, and the required upgrade is bought.
     public bool IsUpgradeVisible(UpgradeDef def)
     {
-        return !HasUpgrade(def.Id) && scaleTier1 >= def.RequiredExpansions &&
+        return !HasUpgrade(def.Id) && scaleTier1 >= def.RequiredExpansions && shiftCount >= def.RequiredShifts &&
                (def.RequiredUpgradeId == null || HasUpgrade(def.RequiredUpgradeId));
     }
 
     public bool CanBuyUpgrade(UpgradeDef def)
     {
-        return IsUpgradeVisible(def) && knowledge >= def.CostScaled;
+        return IsUpgradeVisible(def) && Balance(def.Currency) >= def.CostAmount;
     }
 
     public int AffordableUpgradeCount()
@@ -156,7 +233,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         var count = 0;
         foreach (var def in Upgrades.All)
         {
-            if (CanBuyUpgrade(def))
+            if (def.Currency == UpgradeCurrency.Insight && CanBuyUpgrade(def))
             {
                 count++;
             }
@@ -172,8 +249,92 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             return false;
         }
 
-        knowledge -= def.CostScaled;
+        if (def.Currency == UpgradeCurrency.Insight)
+        {
+            knowledge -= def.CostAmount;
+        }
+        else
+        {
+            metaInsight -= def.CostAmount;
+        }
+
         upgrades.Add(def.Id);
+        return true;
+    }
+
+    // Debug helpers, used by the debug row of the Insight tab (only shown when the game's debug mode is enabled).
+    public void DebugAddInsight(BigInteger wholeInsight)
+    {
+        var added = wholeInsight * KnowledgeRules.Scale;
+        knowledge += added;
+        produced += added;
+    }
+
+    public void DebugAddMetaInsight(int amount)
+    {
+        metaInsight += amount;
+        metaInsightEarned += amount;
+    }
+
+    public void DebugResetTutorial()
+    {
+        tutorialStage = 0;
+    }
+
+    public bool CanExpandMi()
+    {
+        return metaInsight >= NextMiExpansionCost;
+    }
+
+    public bool TryExpandMi()
+    {
+        var cost = NextMiExpansionCost;
+        if (metaInsight < cost)
+        {
+            return false;
+        }
+
+        metaInsight -= cost;
+        scaleMi++;
+        return true;
+    }
+
+    // Paradigm shift: resets Insight, the Insight expansions and the Insight upgrades, and grants Meta-Insight.
+    public bool TryShift(string newSchoolId = null)
+    {
+        var gain = MetaInsightGain;
+        if (gain < 1)
+        {
+            return false;
+        }
+
+        metaInsight += gain;
+        metaInsightEarned += gain;
+        shiftCount++;
+        schoolId = SchoolsUnlocked && Schools.Find(newSchoolId) != null ? newSchoolId : "";
+
+        scaleTier1 = 0;
+        produced = BigInteger.Zero;
+        knowledgeRemainder = 0d;
+        var startingKnowledge = 0d;
+        foreach (var def in Upgrades.All)
+        {
+            if (!HasUpgrade(def.Id))
+            {
+                continue;
+            }
+
+            if (def.Currency == UpgradeCurrency.Insight)
+            {
+                upgrades.Remove(def.Id);
+            }
+            else if (def.Effect == UpgradeEffect.StartingKnowledge)
+            {
+                startingKnowledge += def.Value;
+            }
+        }
+
+        knowledge = new BigInteger(startingKnowledge * KnowledgeRules.Scale);
         return true;
     }
 
@@ -218,6 +379,17 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
         AddProduction(ProductionTier1 * KnowledgeRules.Scale * dt);
 
+        if (HasUpgrade(Upgrades.AutoUpgrade))
+        {
+            foreach (var def in Upgrades.All)
+            {
+                if (def.Currency == UpgradeCurrency.Insight)
+                {
+                    TryBuyUpgrade(def);
+                }
+            }
+        }
+
         var newIdleMode = researchComplete && RecordArchive.AnyOperational;
         if (newIdleMode != idleMode)
         {
@@ -237,7 +409,9 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         var exact = scaledAmount + knowledgeRemainder;
         var whole = Math.Floor(exact);
         knowledgeRemainder = exact - whole;
-        knowledge += new BigInteger(whole);
+        var added = new BigInteger(whole);
+        knowledge += added;
+        produced += added;
     }
 
     private void UpdateTutorial()
@@ -253,7 +427,9 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             case 0: reached = researchComplete; break;
             case 1: reached = RecordArchive.AnyOperational; break;
             case 2: reached = CanExpandTier1(); break;
-            default: reached = AffordableUpgradeCount() > 0; break;
+            case 3: reached = AffordableUpgradeCount() > 0; break;
+            case 4: reached = CanShift; break;
+            default: reached = SchoolsUnlocked; break;
         }
 
         if (!reached)

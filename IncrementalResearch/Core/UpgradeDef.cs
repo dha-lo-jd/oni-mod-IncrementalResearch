@@ -9,8 +9,20 @@ public enum UpgradeEffect
     ProductionMultiplier,
     // Replaces the growth rate of the expansion cost (the lowest purchased value counts).
     ExpansionCostGrowth,
+    // Multiplies the base cost of the Insight expansion.
+    ExpansionCostMultiplier,
+    // Insight (in whole units) the colony starts a cycle with after a paradigm shift.
+    StartingKnowledge,
+    // Buys affordable Insight upgrades automatically.
+    AutoBuyUpgrades,
     // Unlocks a convenience feature, identified by the upgrade id.
     Convenience,
+}
+
+public enum UpgradeCurrency
+{
+    Insight,
+    MetaInsight,
 }
 
 // A one-time purchase that adds a multiplier or an effect. See docs/spec-upgrades.md.
@@ -19,18 +31,24 @@ public sealed class UpgradeDef
     public string Id;
     public LocString Name;
     public LocString Description;
+    public UpgradeCurrency Currency;
     // 0 for upgrades that apply to every tier.
     public int Tier;
-    // Cost in Insight, in whole units (scaled by KnowledgeRules.Scale when paid).
+    // Cost in whole units of the currency.
     public long Cost;
     public UpgradeEffect Effect;
     public double Value;
-    // Unlocks (becomes visible) once the tier has been expanded this many times.
+    // Unlocks (becomes visible) once the tier has been expanded this many times...
     public int RequiredExpansions;
+    // ...and the colony has made this many paradigm shifts.
+    public int RequiredShifts;
     public string RequiredUpgradeId;
 
     public bool IsGlobal => Tier == 0;
-    public BigInteger CostScaled => new BigInteger(Cost) * KnowledgeRules.Scale;
+
+    // Insight is held in thousandths (KnowledgeRules.Scale); Meta-Insight in whole units.
+    public BigInteger CostAmount =>
+        Currency == UpgradeCurrency.Insight ? new BigInteger(Cost) * KnowledgeRules.Scale : new BigInteger(Cost);
 }
 
 public static class Upgrades
@@ -41,6 +59,9 @@ public static class Upgrades
     public const string Shelving = "T1_SHELVING";
     public const string Bulk = "T1_BULK";
     public const string Network = "G_NETWORK";
+    public const string HeadStart = "M_HEADSTART";
+    public const string Discount = "M_DISCOUNT";
+    public const string AutoUpgrade = "M_AUTO_UPGRADE";
 
     public static readonly IReadOnlyList<UpgradeDef> All = new List<UpgradeDef>
     {
@@ -75,6 +96,24 @@ public static class Upgrades
         {
             Id = Network, Name = STRINGS.UI.UPGRADES.G_NETWORK.NAME, Description = STRINGS.UI.UPGRADES.G_NETWORK.DESC,
             Tier = 0, Cost = 5000, Effect = UpgradeEffect.ProductionMultiplier, Value = 1.5d, RequiredExpansions = 20,
+        },
+        new UpgradeDef
+        {
+            Id = HeadStart, Name = STRINGS.UI.UPGRADES.M_HEADSTART.NAME, Description = STRINGS.UI.UPGRADES.M_HEADSTART.DESC,
+            Currency = UpgradeCurrency.MetaInsight, Tier = 0, Cost = 3, Effect = UpgradeEffect.StartingKnowledge,
+            Value = 100d, RequiredShifts = 1,
+        },
+        new UpgradeDef
+        {
+            Id = Discount, Name = STRINGS.UI.UPGRADES.M_DISCOUNT.NAME, Description = STRINGS.UI.UPGRADES.M_DISCOUNT.DESC,
+            Currency = UpgradeCurrency.MetaInsight, Tier = 1, Cost = 8, Effect = UpgradeEffect.ExpansionCostMultiplier,
+            Value = 0.5d, RequiredShifts = 2,
+        },
+        new UpgradeDef
+        {
+            Id = AutoUpgrade, Name = STRINGS.UI.UPGRADES.M_AUTO_UPGRADE.NAME,
+            Description = STRINGS.UI.UPGRADES.M_AUTO_UPGRADE.DESC, Currency = UpgradeCurrency.MetaInsight, Tier = 0,
+            Cost = 20, Effect = UpgradeEffect.AutoBuyUpgrades, Value = 0d, RequiredShifts = 3,
         },
     };
 }

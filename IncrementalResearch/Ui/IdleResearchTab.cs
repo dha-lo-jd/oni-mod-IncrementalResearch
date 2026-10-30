@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using IncrementalResearch.Core;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace IncrementalResearch.Ui;
@@ -14,7 +15,13 @@ internal sealed class IdleResearchTab : MonoBehaviour
     // The panel covers the whole screen; its content starts below the toggle button.
     private const float ContentTopMargin = 56f;
     private const float UpgradeRowHeight = 56f;
-    private const float UpgradeListTop = 460f;
+    private const float ContentMinHeight = 800f;
+    private static readonly Color SelectedButtonColor = new Color(0.30f, 0.45f, 0.65f, 1f);
+    // The upgrade list starts lower when the paradigm shift block above it is shown.
+    private const float ParadigmTop = 420f;
+    private const float UpgradeHeaderTop = 420f;
+    private const float UpgradeHeaderTopWithParadigm = 600f;
+    private const float SchoolBlockHeight = 100f;
 
     private ResearchScreen screen;
     private RectTransform host;
@@ -34,6 +41,23 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private Button expandTenButton;
     private Button expandMaxButton;
     private LocText upgradesHeader;
+    private GameObject debugRow;
+    private LocText schoolLabel;
+    private LocText schoolPickLabel;
+    private readonly List<(string id, Button button, Image image)> schoolButtons =
+        new List<(string, Button, Image)>();
+    // School picked for the next cycle; null means none. Starts as the current school.
+    private string pickedSchool;
+    private bool schoolPickInitialized;
+    private RectTransform scrollContent;
+    private LocText paradigmHeader;
+    private LocText miLabel;
+    private LocText miUnitLabel;
+    private LocText producedLabel;
+    private Button shiftButton;
+    private LocText shiftLabel;
+    private Button miExpandButton;
+    private LocText miExpandLabel;
     private LocText purchasedLabel;
     private readonly List<UpgradeRow> upgradeRows = new List<UpgradeRow>();
 
@@ -87,7 +111,25 @@ internal sealed class IdleResearchTab : MonoBehaviour
         var background = panelRect.gameObject.AddComponent<Image>();
         background.color = UiFactory.PanelColor;
         panel = panelRect.gameObject;
-        var content = UiFactory.CreateStretched("Content", panelRect, 0f, ContentTopMargin, 0f, 0f);
+        // The content scrolls with the mouse wheel, since the lists below can grow taller than the screen.
+        var viewport = UiFactory.CreateStretched("Viewport", panelRect, 0f, ContentTopMargin, 0f, 0f);
+        viewport.gameObject.AddComponent<RectMask2D>();
+        var catcher = viewport.gameObject.AddComponent<Image>();
+        catcher.color = new Color(0f, 0f, 0f, 0f);
+        var content = UiFactory.CreateStretched("Content", viewport, 0f, 0f, 0f, 0f);
+        content.anchorMin = new Vector2(0f, 1f);
+        content.anchorMax = new Vector2(1f, 1f);
+        content.pivot = new Vector2(0f, 1f);
+        content.offsetMin = new Vector2(0f, -ContentMinHeight);
+        content.offsetMax = Vector2.zero;
+        scrollContent = content;
+        var scroll = viewport.gameObject.AddComponent<KScrollRect>();
+        scroll.viewport = viewport;
+        scroll.content = content;
+        scroll.horizontal = false;
+        scroll.vertical = true;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        scroll.scrollSensitivity = 40f;
 
         UiFactory.CreateLabel(content, STRINGS.UI.TAB.TITLE, 40f, 30f, 600f, 40f, fontSize: 28f);
         insightLabel = UiFactory.CreateLabel(content, "", 40f, 90f, 600f, 30f, fontSize: 22f);
@@ -104,7 +146,24 @@ internal sealed class IdleResearchTab : MonoBehaviour
         expandMaxButton = UiFactory.CreateButton(content, STRINGS.UI.UPGRADES.BULK_MAX, 640f, 350f, 90f, 40f,
             () => ExpandMany(int.MaxValue), out _);
 
-        upgradesHeader = UiFactory.CreateLabel(content, STRINGS.UI.UPGRADES.HEADER, 40f, 420f, 600f, 34f, fontSize: 22f);
+        paradigmHeader = UiFactory.CreateLabel(content, STRINGS.UI.PARADIGM.HEADER, 40f, ParadigmTop, 600f, 34f, fontSize: 22f);
+        miLabel = UiFactory.CreateLabel(content, "", 60f, ParadigmTop + 40f, 960f, 30f);
+        miUnitLabel = UiFactory.CreateLabel(content, "", 60f, ParadigmTop + 75f, 400f, 30f);
+        producedLabel = UiFactory.CreateLabel(content, "", 460f, ParadigmTop + 75f, 560f, 30f);
+        shiftButton = UiFactory.CreateButton(content, "", 60f, ParadigmTop + 115f, 380f, 40f, Shift, out shiftLabel);
+        miExpandButton = UiFactory.CreateButton(content, "", 460f, ParadigmTop + 115f, 460f, 40f, ExpandMi,
+            out miExpandLabel);
+
+        schoolLabel = UiFactory.CreateLabel(content, "", 60f, ParadigmTop + 165f, 960f, 30f);
+        schoolPickLabel = UiFactory.CreateLabel(content, STRINGS.UI.SCHOOLS.PICK, 60f, ParadigmTop + 205f, 200f, 30f);
+        var pickX = 270f;
+        AddSchoolButton(content, null, STRINGS.UI.SCHOOLS.NONE, ref pickX);
+        foreach (var school in Schools.All)
+        {
+            AddSchoolButton(content, school.Id, school.Name.text, ref pickX);
+        }
+
+        upgradesHeader = UiFactory.CreateLabel(content, STRINGS.UI.UPGRADES.HEADER, 40f, UpgradeHeaderTop, 600f, 34f, fontSize: 22f);
         foreach (var def in Upgrades.All)
         {
             var row = new UpgradeRow { Def = def };
@@ -118,6 +177,8 @@ internal sealed class IdleResearchTab : MonoBehaviour
         }
 
         purchasedLabel = UiFactory.CreateLabel(content, "", 60f, 0f, 960f, 30f);
+
+        BuildDebugRow(viewport);
 
         // The button stays above the panel.
         toggleRect.SetAsLastSibling();
@@ -167,6 +228,67 @@ internal sealed class IdleResearchTab : MonoBehaviour
         Refresh();
     }
 
+    // Shortcuts for testing, shown only in the game's debug mode. Not translated.
+    private void BuildDebugRow(RectTransform content)
+    {
+        var rect = UiFactory.CreateRect("DebugRow", content, 0f, 0f, 1000f, 44f);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.zero;
+        rect.pivot = Vector2.zero;
+        rect.anchoredPosition = new Vector2(40f, 20f);
+        debugRow = rect.gameObject;
+        var x = 0f;
+        foreach (var (text, action) in new (string, UnityAction)[]
+                 {
+                     ("[Debug] +1e3 Insight", () => KnowledgeState.Instance?.DebugAddInsight(1000)),
+                     ("+1e6", () => KnowledgeState.Instance?.DebugAddInsight(1000000)),
+                     ("+1e9", () => KnowledgeState.Instance?.DebugAddInsight(1000000000)),
+                     ("+10 MI", () => KnowledgeState.Instance?.DebugAddMetaInsight(10)),
+                     ("Reset tutorial", () => KnowledgeState.Instance?.DebugResetTutorial()),
+                 })
+        {
+            var width = text.Length > 8 ? 200f : 100f;
+            UiFactory.CreateButton(rect, text, x, 0f, width, 40f, action, out _);
+            x += width + 10f;
+        }
+
+        debugRow.SetActive(false);
+    }
+
+    private void AddSchoolButton(RectTransform parent, string id, string text, ref float x)
+    {
+        var captured = id;
+        var button = UiFactory.CreateButton(parent, text, x, ParadigmTop + 200f, 160f, 40f,
+            () => pickedSchool = captured, out _);
+        schoolButtons.Add((id, button, button.GetComponent<Image>()));
+        x += 170f;
+    }
+
+    private void Shift()
+    {
+        var state = KnowledgeState.Instance;
+        if (state == null || !state.CanShift)
+        {
+            return;
+        }
+
+        var schoolName = state.SchoolsUnlocked
+            ? (Schools.Find(pickedSchool)?.Name.text ?? STRINGS.UI.SCHOOLS.NONE.text)
+            : null;
+        var school = state.SchoolsUnlocked ? pickedSchool : null;
+        ShiftDialog.Show(state.MetaInsightGain, schoolName, () =>
+        {
+            KnowledgeState.Instance?.TryShift(school);
+            Refresh();
+        });
+    }
+
+    private void ExpandMi()
+    {
+        KnowledgeState.Instance?.TryExpandMi();
+        Refresh();
+    }
+
     private void BuyUpgrade(UpgradeDef def)
     {
         KnowledgeState.Instance?.TryBuyUpgrade(def);
@@ -187,6 +309,12 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private void Refresh()
     {
         PlaceToggleButton();
+        var debug = DebugHandler.enabled;
+        if (debugRow.activeSelf != debug)
+        {
+            debugRow.SetActive(debug);
+        }
+
         var state = KnowledgeState.Instance;
         var unlocked = state != null && state.Unlocked;
         if (toggleButton.activeSelf != unlocked)
@@ -223,12 +351,65 @@ internal sealed class IdleResearchTab : MonoBehaviour
         expandTenButton.interactable = state.CanExpandTier1();
         expandMaxButton.interactable = state.CanExpandTier1();
 
-        RefreshUpgrades(state);
+        var paradigm = state.ShiftCount > 0 || state.MetaInsight > 0 || state.CanShift;
+        paradigmHeader.gameObject.SetActive(paradigm);
+        miLabel.gameObject.SetActive(paradigm);
+        miUnitLabel.gameObject.SetActive(paradigm);
+        producedLabel.gameObject.SetActive(paradigm);
+        shiftButton.gameObject.SetActive(paradigm);
+        miExpandButton.gameObject.SetActive(paradigm);
+        if (paradigm)
+        {
+            miLabel.text = string.Format(STRINGS.UI.PARADIGM.MI_LINE, NumberFormat.FormatWhole(state.MetaInsight),
+                NumberFormat.FormatWhole(state.MetaInsightEarned), NumberFormat.Format(state.MetaInsightMultiplier));
+            miUnitLabel.text = string.Format(STRINGS.UI.TAB.UNIT_VALUE, STRINGS.UI.PARADIGM.MI_UNIT, state.ScaleMi);
+            producedLabel.text = string.Format(STRINGS.UI.PARADIGM.PRODUCED,
+                NumberFormat.FormatScaled(state.ProducedScaled));
+            shiftLabel.text = state.CanShift
+                ? string.Format(STRINGS.UI.PARADIGM.SHIFT_BUTTON, NumberFormat.FormatWhole(state.MetaInsightGain))
+                : string.Format(STRINGS.UI.PARADIGM.GAIN_NONE, NumberFormat.Format(KnowledgeRules.MiThreshold));
+            shiftButton.interactable = state.CanShift;
+            miExpandLabel.text = string.Format(STRINGS.UI.PARADIGM.MI_EXPAND_BUTTON, STRINGS.UI.PARADIGM.MI_UNIT,
+                NumberFormat.FormatWhole(state.NextMiExpansionCost));
+            miExpandButton.interactable = state.CanExpandMi();
+        }
+
+        var schools = paradigm && state.SchoolsUnlocked;
+        if (!schoolPickInitialized)
+        {
+            pickedSchool = state.CurrentSchool?.Id;
+            schoolPickInitialized = true;
+        }
+
+        schoolLabel.gameObject.SetActive(schools);
+        schoolPickLabel.gameObject.SetActive(schools);
+        foreach (var (id, button, image) in schoolButtons)
+        {
+            button.gameObject.SetActive(schools);
+            image.color = id == pickedSchool ? SelectedButtonColor : UiFactory.ButtonColor;
+        }
+
+        if (schools)
+        {
+            var current = state.CurrentSchool;
+            schoolLabel.text = current == null
+                ? string.Format(STRINGS.UI.SCHOOLS.CURRENT, STRINGS.UI.SCHOOLS.NONE.text)
+                : string.Format(STRINGS.UI.SCHOOLS.CURRENT, current.Name.text + " - " + current.Description.text);
+        }
+
+        RefreshUpgrades(state, paradigm, schools);
     }
 
-    private void RefreshUpgrades(KnowledgeState state)
+    private void RefreshUpgrades(KnowledgeState state, bool paradigm, bool schools)
     {
-        var y = UpgradeListTop;
+        var headerTop = paradigm ? UpgradeHeaderTopWithParadigm : UpgradeHeaderTop;
+        if (schools)
+        {
+            headerTop += SchoolBlockHeight;
+        }
+
+        UiFactory.Place((RectTransform)upgradesHeader.transform, 40f, headerTop, 600f, 34f);
+        var y = headerTop + 40f;
         foreach (var row in upgradeRows)
         {
             var visible = state.IsUpgradeVisible(row.Def);
@@ -240,7 +421,9 @@ internal sealed class IdleResearchTab : MonoBehaviour
 
             UiFactory.Place((RectTransform)row.Root.transform, 0f, y, 1000f, UpgradeRowHeight);
             y += UpgradeRowHeight;
-            row.BuyLabel.text = string.Format(STRINGS.UI.UPGRADES.BUY, NumberFormat.FormatScaled(row.Def.CostScaled));
+            row.BuyLabel.text = row.Def.Currency == UpgradeCurrency.Insight
+                ? string.Format(STRINGS.UI.UPGRADES.BUY, NumberFormat.FormatScaled(row.Def.CostAmount))
+                : string.Format(STRINGS.UI.UPGRADES.BUY_MI, NumberFormat.FormatWhole(row.Def.CostAmount));
             row.Buy.interactable = state.CanBuyUpgrade(row.Def);
         }
 
@@ -258,6 +441,10 @@ internal sealed class IdleResearchTab : MonoBehaviour
         {
             UiFactory.Place((RectTransform)purchasedLabel.transform, 60f, y + 10f, 960f, 30f);
             purchasedLabel.text = string.Format(STRINGS.UI.UPGRADES.PURCHASED, string.Join(", ", names));
+            y += 50f;
         }
+
+        // Room for the debug row at the bottom of the viewport.
+        scrollContent.offsetMin = new Vector2(0f, -Mathf.Max(ContentMinHeight, y + 80f));
     }
 }
