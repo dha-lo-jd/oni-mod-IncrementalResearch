@@ -28,15 +28,29 @@ public static class GeneratedBuildings_LoadGeneratedBuildings_Patch
 
         added = true;
         ModUtil.AddBuildingToPlanScreen("Equipment", RecordArchiveConfig.ID, "research");
+        ModUtil.AddBuildingToPlanScreen("Equipment", ComputeRoomConfig.ID, "research");
+        ModUtil.AddBuildingToPlanScreen("Equipment", VacuumLabConfig.ID, "research");
     }
 }
 
-// The archive is unlocked once the whole research tree is complete.
+// The archive is unlocked once the whole research tree is complete; the upper tiers by expanding the tier below.
 [HarmonyPatch(typeof(TechItems), nameof(TechItems.IsTechItemComplete))]
 public static class TechItems_IsTechItemComplete_Patch
 {
     public static void Postfix(string id, ref bool __result)
     {
+        if (id == ComputeRoomConfig.ID)
+        {
+            __result = KnowledgeState.Instance != null && KnowledgeState.Instance.IsTierUnlocked(2);
+            return;
+        }
+
+        if (id == VacuumLabConfig.ID)
+        {
+            __result = KnowledgeState.Instance != null && KnowledgeState.Instance.IsTierUnlocked(3);
+            return;
+        }
+
         if (id != RecordArchiveConfig.ID)
         {
             return;

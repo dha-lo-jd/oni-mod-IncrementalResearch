@@ -65,6 +65,11 @@ public static class Upgrades
     public const string Shelving = "T1_SHELVING";
     public const string Bulk = "T1_BULK";
     public const string Network = "G_NETWORK";
+    public const string Parallel = "T2_PARALLEL";
+    public const string Pipeline = "T2_PIPELINE";
+    public const string Cooling = "T2_COOLING";
+    public const string Isolation = "T3_ISOLATION";
+    public const string Chamber = "T3_CHAMBER";
     public const string AutoExpand = "T1_AUTO_EXPAND";
     public const string AutoExpandMi = "M_AUTO_EXPAND";
     public const string HeadStart = "M_HEADSTART";
@@ -104,6 +109,32 @@ public static class Upgrades
         {
             Id = Network, Name = STRINGS.UI.UPGRADES.G_NETWORK.NAME, Description = STRINGS.UI.UPGRADES.G_NETWORK.DESC,
             Tier = 0, Cost = 5000, Effect = UpgradeEffect.ProductionMultiplier, Value = 1.5d, RequiredExpansions = 20,
+        },
+        new UpgradeDef
+        {
+            Id = Parallel, Name = STRINGS.UI.UPGRADES.T2_PARALLEL.NAME, Description = STRINGS.UI.UPGRADES.T2_PARALLEL.DESC,
+            Tier = 2, Cost = 50000, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 5,
+        },
+        new UpgradeDef
+        {
+            Id = Pipeline, Name = STRINGS.UI.UPGRADES.T2_PIPELINE.NAME, Description = STRINGS.UI.UPGRADES.T2_PIPELINE.DESC,
+            Tier = 2, Cost = 2000000, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 15,
+            RequiredUpgradeId = Parallel,
+        },
+        new UpgradeDef
+        {
+            Id = Cooling, Name = STRINGS.UI.UPGRADES.T2_COOLING.NAME, Description = STRINGS.UI.UPGRADES.T2_COOLING.DESC,
+            Tier = 2, Cost = 500000, Effect = UpgradeEffect.ExpansionCostGrowth, Value = 1.16d, RequiredExpansions = 10,
+        },
+        new UpgradeDef
+        {
+            Id = Isolation, Name = STRINGS.UI.UPGRADES.T3_ISOLATION.NAME, Description = STRINGS.UI.UPGRADES.T3_ISOLATION.DESC,
+            Tier = 3, Cost = 5000000000, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 5,
+        },
+        new UpgradeDef
+        {
+            Id = Chamber, Name = STRINGS.UI.UPGRADES.T3_CHAMBER.NAME, Description = STRINGS.UI.UPGRADES.T3_CHAMBER.DESC,
+            Tier = 3, Cost = 50000000000, Effect = UpgradeEffect.ExpansionCostGrowth, Value = 1.20d, RequiredExpansions = 10,
         },
         new UpgradeDef
         {

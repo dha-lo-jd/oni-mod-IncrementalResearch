@@ -25,8 +25,19 @@ internal static class UiFactory
         rect.anchorMin = new Vector2(0f, 1f);
         rect.anchorMax = new Vector2(0f, 1f);
         rect.pivot = new Vector2(0f, 1f);
-        rect.anchoredPosition = new Vector2(x, -y);
-        rect.sizeDelta = new Vector2(width, height);
+        // Called on every refresh; writing unchanged values would still dirty the layout and disturb scrolling.
+        var position = new Vector2(x, -y);
+        if (rect.anchoredPosition != position)
+        {
+            rect.anchoredPosition = position;
+        }
+
+        var size = new Vector2(width, height);
+        if (rect.sizeDelta != size)
+        {
+            rect.sizeDelta = size;
+        }
+
         return rect;
     }
 

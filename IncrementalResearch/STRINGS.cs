@@ -5,7 +5,7 @@ public static class STRINGS
 {
     public static class UI
     {
-        public static LocString TITLE = "Incremental Research";
+        public static LocString TITLE = "Project Ⅲ:Incremental Insight Initiative";
 
         public static class TAB
         {
@@ -41,6 +41,10 @@ public static class STRINGS
                 "Build a <b>Record Archive</b> (Equipment menu, Research tab). While it is powered, the colony's research output keeps turning into <b>Insight</b>.";
             public static LocString STAGE2_TITLE = "The Record Archive Is Running";
             public static LocString STAGE2_BODY =
+                "<b>Project III (Three) Begins</b>\n\n" +
+                "<i>The Duplicants built the 'Record Archive' to preserve the fruits of their research and the footprints of their inquiry. Then they launched the \"Incremental Insight Initiative\", known as \"Project III\": a grand plan to multiply and gather the crystals of knowledge that, for now, point in no direction.\n" +
+                "For the moment, most of the plan is nothing but pie in the sky. But if they never give up on persistence and accumulation, they may yet reach the sky...\n\n" +
+                "\"The aim of scholarship is not to find answers. It is to pose the right questions and get pleasantly lost.\"  - Albert L. Davoski</i>\n\n" +
                 "Research buildings keep working even though the research tree is complete, and their output is now turned into Insight.\n\n" +
                 "Insight is shown above the build menu. Open the <b>Insight</b> button on the research screen to see the details.";
             public static LocString STAGE3_TITLE = "Expanding the Archive";
@@ -55,6 +59,18 @@ public static class STRINGS
             public static LocString STAGE6_TITLE = "Schools of Thought";
             public static LocString STAGE6_BODY =
                 "The colony has shifted often enough to form schools of thought. At each paradigm shift you can now choose a school for the next cycle: each favors some tiers of facilities over others. You may also choose none.";
+            public static LocString STAGE7_TITLE = "Blueprint: Compute Room";
+            public static LocString STAGE7_BODY =
+                "<b>God Does Arithmetic (Because It Was Outsourced!)</b>\n\n" +
+                "<i>Calculation is inseparable from the pursuit of knowledge. Yet there is only so much a notebook can hold, and it is exhausting to keep the pen moving. The Duplicants seem to have decided to wait instead for an -oracle- to descend from a machine far wiser than themselves.\n\n\n" +
+                "\"The act of calculating is not labor. It is art.\"  - Albert L. Davoski</i>\n\n" +
+                "The Record Archive has been expanded far enough to draw up the next facility. The Compute Room (Equipment menu, Research tab) is now available. Build it from steel and keep its room at 30 C or below (it gives off more heat the more you expand it): while it runs, it builds up the performance of the Record Archive. If it stops, its activity falls and the performance fades toward x1, but nothing built up is lost.";
+            public static LocString STAGE8_TITLE = "Blueprint: Vacuum Lab";
+            public static LocString STAGE8_BODY =
+                "<b>Duplicants Love a Vacuum</b>\n\n" +
+                "<i>Is there something \"in\" a vacuum? Whatever the philosophers say, the hole of a giant donut is perfect for all manner of research. It would be far more unnatural to dislike such a convenient thing. At any rate, a room packed with vacuum like sardines should fill our tin cans with Insight as well.\n\n\n" +
+                "\"Make the air clean. Yes, take it out.\"  - Albert L. Davoski</i>\n\n" +
+                "The Compute Room has been expanded far enough to draw up the next facility. The Vacuum Lab (Equipment menu, Research tab) is now available. It needs a vacuum around it, and heat does not escape in a vacuum, so mind its temperature. While it runs, it builds up the performance of the Compute Room.";
             public static LocString STAGE3_BODY =
                 "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more.";
         }
@@ -129,6 +145,36 @@ public static class STRINGS
                 public static LocString DESC = "Automatically builds theories whenever affordable.";
             }
 
+            public static class T2_PARALLEL
+            {
+                public static LocString NAME = "Parallelization";
+                public static LocString DESC = "Compute Room build-up speed x2.";
+            }
+
+            public static class T2_PIPELINE
+            {
+                public static LocString NAME = "Pipeline Processing";
+                public static LocString DESC = "Compute Room build-up speed x2.";
+            }
+
+            public static class T2_COOLING
+            {
+                public static LocString NAME = "Optimized Cooling";
+                public static LocString DESC = "Compute Nodes expansion cost growth drops from 1.18 to 1.16.";
+            }
+
+            public static class T3_ISOLATION
+            {
+                public static LocString NAME = "Line Isolation";
+                public static LocString DESC = "Vacuum Lab build-up speed x2.";
+            }
+
+            public static class T3_CHAMBER
+            {
+                public static LocString NAME = "High Vacuum";
+                public static LocString DESC = "Experiment Lines expansion cost growth drops from 1.22 to 1.20.";
+            }
+
             public static class G_NETWORK
             {
                 public static LocString NAME = "Record Network";
@@ -178,6 +224,21 @@ public static class STRINGS
             }
         }
 
+        public static class TIERS
+        {
+            public static LocString UNIT_2 = "Compute Nodes";
+            public static LocString UNIT_3 = "Experiment Lines";
+            public static LocString TOO_HOT_NAME = "Too hot to compute";
+            public static LocString TOO_HOT_TOOLTIP = "The Compute Room only runs while its cell is cool enough. Its activity is falling.";
+            public static LocString NOT_VACUUM_NAME = "Not a vacuum";
+            public static LocString NOT_VACUUM_TOOLTIP = "The Vacuum Lab only runs when every cell it occupies is thin enough. Its activity is falling.";
+            public static LocString REQUIRE_TEMPERATURE = "Runs at {0} C or below. Extra heat from expansion: +{1} kDTU/s (grows as it is expanded, up to a limit)";
+            public static LocString REQUIRE_MASS = "Runs when every occupied cell holds {0} g of gas or less";
+            public static LocString STATUS_TOOLTIP = "Insight: {0}\n{1}: {2}\nActivity: {3}%\nPerformance given to the tier below: x{4}";
+            public static LocString HEADER_BONUS = "Performance: x{0} (built up: {1}, activity: {2}%)";
+            public static LocString PRODUCTION_RATE = "Build-up: +{0}/s";
+        }
+
         public static class ARCHIVE
         {
             public static LocString SIDESCREEN_TITLE = "Record Archive";
@@ -192,6 +253,22 @@ public static class STRINGS
     {
         public static class PREFABS
         {
+            public static class IR_COMPUTEROOM
+            {
+                public static LocString NAME = "Compute Room";
+                public static LocString DESC = "A room of racks that keeps the Record Archive sharp.";
+                public static LocString EFFECT =
+                    "Builds up the performance of the Record Archive while running. Runs only while its cell is cool enough, and gives off more heat the more it is expanded.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+            }
+
+            public static class IR_VACUUMLAB
+            {
+                public static LocString NAME = "Vacuum Lab";
+                public static LocString DESC = "A sealed laboratory where experiments need nothing in the way.";
+                public static LocString EFFECT =
+                    "Builds up the performance of the Compute Room while running. Runs only when every cell it occupies is thin enough.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+            }
+
             public static class IR_RECORDARCHIVE
             {
                 public static LocString NAME = "Record Archive";
