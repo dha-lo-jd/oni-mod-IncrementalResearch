@@ -112,10 +112,14 @@ msgid "Insight Research Is Now Possible"
 msgstr "知見の研究が可能になりました"
 
 msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE1_BODY"
-msgid "Every technology has been researched. The research buildings have nothing left to work on, but the colony's research records are still worth something.
+msgid "<i>Must the pursuit of knowledge always be rewarded? No. The adventures and challenges of the mind know neither profit nor end. The footprints of that striving become a road, and the Insight stored up without ever taking shape may become a staircase to glory... or it may not. Such is research. Better than boredom, and that is enough, isn't it?</i>
+
+Every technology has been researched. The research buildings have nothing left to work on, but the colony's research records are still worth something.
 
 Build a <b>Record Archive</b> (Equipment menu, Research tab). While it is powered, the colony's research output keeps turning into <b>Insight</b>."
-msgstr "すべての技術の研究が完了しました。研究設備にはもう研究するものが残っていませんが、コロニーの研究記録にはまだ価値があります。
+msgstr "<i>知への探究に、常に見返りが必要ですか?いいえ、精神の冒険と挑戦には、損得も終わりもありません。そうした邁進の足跡が道となり、形どられずとも蓄えた『知見』が、栄光に至る階段になる…こともあればならないこともある、研究とはそういうものです。退屈よりはマシ、それで十分でしょう?</i>
+
+すべての技術の研究が完了しました。研究設備にはもう研究するものが残っていませんが、コロニーの研究記録にはまだ価値があります。
 
 <b>記録保管庫</b>(設備メニューの研究タブ)を建設してください。電力が供給されている間、コロニーの研究成果は<b>知見</b>に変わり続けます。"
 
@@ -138,3 +142,83 @@ msgstr "記録保管庫の拡張"
 msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE3_BODY"
 msgid "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more."
 msgstr "記録保管庫を拡張できるだけの知見が貯まりました。記録保管庫を選択し、サイドパネルの拡張ボタンを押してください。拡張するたびに生産量が増えますが、次の拡張に必要な知見も増えます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.HEADER"
+msgid "Upgrades"
+msgstr "アップグレード"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.BUY"
+msgid "Buy ({0} Insight)"
+msgstr "購入(知見 {0})"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.PURCHASED"
+msgid "Purchased: {0}"
+msgstr "購入済み: {0}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.BULK_TEN"
+msgid "x10"
+msgstr "×10"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.BULK_MAX"
+msgid "Max"
+msgstr "最大"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.AVAILABLE_TOOLTIP"
+msgid "Upgrades available: {0}"
+msgstr "購入できるアップグレード: {0}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_INDEX.NAME"
+msgid "Indexing"
+msgstr "索引の整備"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_INDEX.DESC"
+msgid "Record Archive production x2."
+msgstr "記録保管庫の生産が2倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_CLASSIFY.NAME"
+msgid "Classification System"
+msgstr "分類体系"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_CLASSIFY.DESC"
+msgid "Record Archive production x2."
+msgstr "記録保管庫の生産が2倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_CROSSREF.NAME"
+msgid "Cross-References"
+msgstr "相互参照"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_CROSSREF.DESC"
+msgid "Record Archive production x3."
+msgstr "記録保管庫の生産が3倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_SHELVING.NAME"
+msgid "Efficient Shelving"
+msgstr "書架の効率化"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_SHELVING.DESC"
+msgid "Expansion cost growth drops from 1.15 to 1.13."
+msgstr "拡張コストの成長率が1.15から1.13に下がる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_BULK.NAME"
+msgid "Bulk Expansion"
+msgstr "一括拡張"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_BULK.DESC"
+msgid "Adds x10 and Max buttons for expanding."
+msgstr "拡張に「×10」「最大」のボタンが加わる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.G_NETWORK.NAME"
+msgid "Record Network"
+msgstr "記録網"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.G_NETWORK.DESC"
+msgid "Production of every facility x1.5. Only the Record Archive exists so far."
+msgstr "すべての設備の生産が1.5倍になる。今のところ対象は記録保管庫だけ。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE4_TITLE"
+msgid "Upgrades"
+msgstr "アップグレード"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE4_BODY"
+msgid "An upgrade is now within reach. Open the Insight tab on the research screen: upgrades add multipliers and other effects, and each can be bought only once. Upgrades cost Insight too, so weigh them against the next expansion."
+msgstr "アップグレードを購入できるようになりました。研究画面の知見タブを開いてください。アップグレードは倍率などの効果を足すもので、それぞれ1回だけ購入できます。アップグレードにも知見がかかるので、次の拡張とどちらを優先するか考えてみてください。"

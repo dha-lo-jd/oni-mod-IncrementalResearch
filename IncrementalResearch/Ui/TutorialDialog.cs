@@ -5,7 +5,7 @@ namespace IncrementalResearch.Ui;
 // The short guided introduction: one dialog per stage, shown as the player reaches each milestone.
 internal static class TutorialDialog
 {
-    public const int StageCount = 3;
+    public const int StageCount = 4;
 
     public static void Show(int stage, System.Action onClosed)
     {
@@ -21,9 +21,13 @@ internal static class TutorialDialog
                 header = STRINGS.UI.TUTORIAL.STAGE2_TITLE;
                 body = STRINGS.UI.TUTORIAL.STAGE2_BODY;
                 break;
-            default:
+            case 2:
                 header = STRINGS.UI.TUTORIAL.STAGE3_TITLE;
                 body = STRINGS.UI.TUTORIAL.STAGE3_BODY;
+                break;
+            default:
+                header = STRINGS.UI.TUTORIAL.STAGE4_TITLE;
+                body = STRINGS.UI.TUTORIAL.STAGE4_BODY;
                 break;
         }
 

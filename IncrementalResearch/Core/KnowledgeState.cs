@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.Serialization;
 using Database;
@@ -21,6 +22,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private double baseRate;
     // Number of tutorial dialogs already shown (see Ui/TutorialDialog).
     [Serialize] private int tutorialStage;
+    // Ids of the purchased upgrades, comma separated.
+    [Serialize] private string upgradesText = "";
 
     private BigInteger knowledge = BigInteger.Zero;
     private double knowledgeRemainder;
@@ -29,18 +32,36 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     private bool researchComplete;
     private bool idleMode;
     private bool tutorialDialogOpen;
+    private readonly HashSet<string> upgrades = new HashSet<string>();
 
     public BigInteger KnowledgeScaled => knowledge;
     public int ScaleTier1 => scaleTier1;
     // The facility itself counts as the first unit; expansions add to it.
     public int HoldingsTier1 => scaleTier1 + 1;
     public double BaseRate => baseRate;
-    public double MultiplierTier1 => 1d;
+    public double MultiplierTier1 => ProductionMultiplier(1);
 
     public double ProductionTier1 =>
         RecordArchive.AnyOperational ? baseRate * HoldingsTier1 * MultiplierTier1 : 0d;
 
-    public BigInteger NextExpansionCostScaled => KnowledgeRules.ExpansionCost(scaleTier1);
+    public BigInteger NextExpansionCostScaled => KnowledgeRules.ExpansionCost(scaleTier1, ExpansionCostGrowth);
+
+    public double ExpansionCostGrowth
+    {
+        get
+        {
+            var growth = KnowledgeRules.ScaleCostGrowth;
+            foreach (var def in Upgrades.All)
+            {
+                if (def.Effect == UpgradeEffect.ExpansionCostGrowth && HasUpgrade(def.Id))
+                {
+                    growth = Math.Min(growth, def.Value);
+                }
+            }
+
+            return growth;
+        }
+    }
 
     // True when there is nothing left to research and an archive keeps the research buildings running.
     public bool IdleMode => idleMode;
@@ -68,6 +89,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     private void OnSerializing()
     {
         knowledgeText = knowledge.ToString();
+        upgradesText = string.Join(",", upgrades);
     }
 
     [OnDeserialized]
@@ -76,6 +98,12 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         if (!BigInteger.TryParse(knowledgeText, out knowledge))
         {
             knowledge = BigInteger.Zero;
+        }
+
+        upgrades.Clear();
+        foreach (var id in (upgradesText ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            upgrades.Add(id);
         }
 
         // Saves from before the tutorial existed have already played through it.
@@ -88,6 +116,65 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public void RecordResearchPoints(string researchTypeId, float points)
     {
         pendingPoints += points * KnowledgeRules.PointWeight(researchTypeId);
+    }
+
+    public bool HasUpgrade(string id)
+    {
+        return upgrades.Contains(id);
+    }
+
+    // Product of the production multipliers that apply to a tier: its own upgrades and the global ones.
+    public double ProductionMultiplier(int tier)
+    {
+        var result = 1d;
+        foreach (var def in Upgrades.All)
+        {
+            if (def.Effect == UpgradeEffect.ProductionMultiplier && (def.Tier == tier || def.IsGlobal) &&
+                HasUpgrade(def.Id))
+            {
+                result *= def.Value;
+            }
+        }
+
+        return result;
+    }
+
+    // Visible once the tier has been expanded enough and the required upgrade has been bought.
+    public bool IsUpgradeVisible(UpgradeDef def)
+    {
+        return !HasUpgrade(def.Id) && scaleTier1 >= def.RequiredExpansions &&
+               (def.RequiredUpgradeId == null || HasUpgrade(def.RequiredUpgradeId));
+    }
+
+    public bool CanBuyUpgrade(UpgradeDef def)
+    {
+        return IsUpgradeVisible(def) && knowledge >= def.CostScaled;
+    }
+
+    public int AffordableUpgradeCount()
+    {
+        var count = 0;
+        foreach (var def in Upgrades.All)
+        {
+            if (CanBuyUpgrade(def))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public bool TryBuyUpgrade(UpgradeDef def)
+    {
+        if (!CanBuyUpgrade(def))
+        {
+            return false;
+        }
+
+        knowledge -= def.CostScaled;
+        upgrades.Add(def.Id);
+        return true;
     }
 
     public bool CanExpandTier1()
@@ -106,6 +193,18 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         knowledge -= cost;
         scaleTier1++;
         return true;
+    }
+
+    // Expands up to the given number of times (or as often as affordable); returns how many were bought.
+    public int TryExpandTier1Many(int maxCount)
+    {
+        var bought = 0;
+        while (bought < maxCount && TryExpandTier1())
+        {
+            bought++;
+        }
+
+        return bought;
     }
 
     public void Sim200ms(float dt)
@@ -153,7 +252,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         {
             case 0: reached = researchComplete; break;
             case 1: reached = RecordArchive.AnyOperational; break;
-            default: reached = CanExpandTier1(); break;
+            case 2: reached = CanExpandTier1(); break;
+            default: reached = AffordableUpgradeCount() > 0; break;
         }
 
         if (!reached)

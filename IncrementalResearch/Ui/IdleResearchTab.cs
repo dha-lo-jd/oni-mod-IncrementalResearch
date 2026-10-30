@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using IncrementalResearch.Core;
 using TMPro;
 using UnityEngine;
@@ -12,6 +13,8 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private const float RefreshInterval = 0.25f;
     // The panel covers the whole screen; its content starts below the toggle button.
     private const float ContentTopMargin = 56f;
+    private const float UpgradeRowHeight = 56f;
+    private const float UpgradeListTop = 460f;
 
     private ResearchScreen screen;
     private RectTransform host;
@@ -28,8 +31,23 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private LocText productionLabel;
     private Button expandButton;
     private LocText expandLabel;
+    private Button expandTenButton;
+    private Button expandMaxButton;
+    private LocText upgradesHeader;
+    private LocText purchasedLabel;
+    private readonly List<UpgradeRow> upgradeRows = new List<UpgradeRow>();
 
     private float nextRefresh;
+
+    private sealed class UpgradeRow
+    {
+        public UpgradeDef Def;
+        public GameObject Root;
+        public LocText Name;
+        public LocText Description;
+        public Button Buy;
+        public LocText BuyLabel;
+    }
 
     public static IdleResearchTab Instance { get; private set; }
 
@@ -81,6 +99,26 @@ internal sealed class IdleResearchTab : MonoBehaviour
         productionLabel = UiFactory.CreateLabel(content, "", 60f, 305f, 600f, 30f);
         expandButton = UiFactory.CreateButton(content, "", 60f, 350f, 460f, 40f, Expand, out expandLabel);
 
+        expandTenButton = UiFactory.CreateButton(content, STRINGS.UI.UPGRADES.BULK_TEN, 540f, 350f, 90f, 40f,
+            () => ExpandMany(10), out _);
+        expandMaxButton = UiFactory.CreateButton(content, STRINGS.UI.UPGRADES.BULK_MAX, 640f, 350f, 90f, 40f,
+            () => ExpandMany(int.MaxValue), out _);
+
+        upgradesHeader = UiFactory.CreateLabel(content, STRINGS.UI.UPGRADES.HEADER, 40f, 420f, 600f, 34f, fontSize: 22f);
+        foreach (var def in Upgrades.All)
+        {
+            var row = new UpgradeRow { Def = def };
+            var captured = def;
+            row.Root = UiFactory.CreateRect("UpgradeRow", content, 0f, 0f, 1000f, UpgradeRowHeight).gameObject;
+            var rowRect = (RectTransform)row.Root.transform;
+            row.Name = UiFactory.CreateLabel(rowRect, def.Name.text, 60f, 0f, 640f, 28f, fontSize: 20f);
+            row.Description = UiFactory.CreateLabel(rowRect, def.Description.text, 60f, 28f, 640f, 28f);
+            row.Buy = UiFactory.CreateButton(rowRect, "", 720f, 6f, 300f, 40f, () => BuyUpgrade(captured), out row.BuyLabel);
+            upgradeRows.Add(row);
+        }
+
+        purchasedLabel = UiFactory.CreateLabel(content, "", 60f, 0f, 960f, 30f);
+
         // The button stays above the panel.
         toggleRect.SetAsLastSibling();
 
@@ -120,6 +158,18 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private void Expand()
     {
         KnowledgeState.Instance?.TryExpandTier1();
+        Refresh();
+    }
+
+    private void ExpandMany(int count)
+    {
+        KnowledgeState.Instance?.TryExpandTier1Many(count);
+        Refresh();
+    }
+
+    private void BuyUpgrade(UpgradeDef def)
+    {
+        KnowledgeState.Instance?.TryBuyUpgrade(def);
         Refresh();
     }
 
@@ -167,5 +217,47 @@ internal sealed class IdleResearchTab : MonoBehaviour
         expandLabel.text = string.Format(STRINGS.UI.ARCHIVE.EXPAND_BUTTON, STRINGS.UI.ARCHIVE.UNIT,
             NumberFormat.FormatScaled(state.NextExpansionCostScaled));
         expandButton.interactable = state.CanExpandTier1();
+        var bulk = state.HasUpgrade(Upgrades.Bulk);
+        expandTenButton.gameObject.SetActive(bulk);
+        expandMaxButton.gameObject.SetActive(bulk);
+        expandTenButton.interactable = state.CanExpandTier1();
+        expandMaxButton.interactable = state.CanExpandTier1();
+
+        RefreshUpgrades(state);
+    }
+
+    private void RefreshUpgrades(KnowledgeState state)
+    {
+        var y = UpgradeListTop;
+        foreach (var row in upgradeRows)
+        {
+            var visible = state.IsUpgradeVisible(row.Def);
+            row.Root.SetActive(visible);
+            if (!visible)
+            {
+                continue;
+            }
+
+            UiFactory.Place((RectTransform)row.Root.transform, 0f, y, 1000f, UpgradeRowHeight);
+            y += UpgradeRowHeight;
+            row.BuyLabel.text = string.Format(STRINGS.UI.UPGRADES.BUY, NumberFormat.FormatScaled(row.Def.CostScaled));
+            row.Buy.interactable = state.CanBuyUpgrade(row.Def);
+        }
+
+        var names = new List<string>();
+        foreach (var def in Upgrades.All)
+        {
+            if (state.HasUpgrade(def.Id))
+            {
+                names.Add(def.Name.text);
+            }
+        }
+
+        purchasedLabel.gameObject.SetActive(names.Count > 0);
+        if (names.Count > 0)
+        {
+            UiFactory.Place((RectTransform)purchasedLabel.transform, 60f, y + 10f, 960f, 30f);
+            purchasedLabel.text = string.Format(STRINGS.UI.UPGRADES.PURCHASED, string.Join(", ", names));
+        }
     }
 }

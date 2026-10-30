@@ -67,8 +67,14 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
                 ? ""
                 : string.Format(STRINGS.UI.ARCHIVE.STATUS_TOOLTIP, NumberFormat.FormatScaled(state.KnowledgeScaled),
                     NumberFormat.Format(state.BaseRate), state.HoldingsTier1, STRINGS.UI.ARCHIVE.UNIT,
-                    NumberFormat.Format(state.ProductionTier1));
+                    NumberFormat.Format(state.ProductionTier1)) + AffordableUpgradesLine(state);
         }
+    }
+
+    private static string AffordableUpgradesLine(KnowledgeState state)
+    {
+        var count = state.AffordableUpgradeCount();
+        return count > 0 ? "\n" + string.Format(STRINGS.UI.UPGRADES.AVAILABLE_TOOLTIP, count) : "";
     }
 
     public string SidescreenTitle => STRINGS.UI.ARCHIVE.SIDESCREEN_TITLE;

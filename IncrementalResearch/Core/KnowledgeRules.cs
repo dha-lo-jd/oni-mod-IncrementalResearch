@@ -17,9 +17,9 @@ public static class KnowledgeRules
     public const float BaseRateTimeConstant = 600f;
 
     // Cost of the next expansion, in thousandths of Insight.
-    public static BigInteger ExpansionCost(int expansions)
+    public static BigInteger ExpansionCost(int expansions, double growth = ScaleCostGrowth)
     {
-        return new BigInteger(Math.Floor(ScaleBaseCost * Math.Pow(ScaleCostGrowth, expansions) * Scale));
+        return new BigInteger(Math.Floor(ScaleBaseCost * Math.Pow(growth, expansions) * Scale));
     }
 
     public static float PointWeight(string researchTypeId)
