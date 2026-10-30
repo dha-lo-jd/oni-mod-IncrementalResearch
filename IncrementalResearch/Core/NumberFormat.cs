@@ -25,6 +25,11 @@ public static class NumberFormat
     // Formats an amount held in thousandths (see KnowledgeRules.Scale). Works for any magnitude.
     public static string FormatScaled(BigInteger scaled)
     {
+        if (scaled >= KnowledgeRules.InfiniteScaled)
+        {
+            return Format(double.PositiveInfinity);
+        }
+
         if (scaled < KnowledgeRules.Scale * 1000000)
         {
             return Format((double)scaled / KnowledgeRules.Scale);

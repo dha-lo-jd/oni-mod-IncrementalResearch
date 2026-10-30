@@ -42,7 +42,7 @@ public static class STRINGS
             public static LocString STAGE2_TITLE = "The Record Archive Is Running";
             public static LocString STAGE2_BODY =
                 "<b>Project III (Three) Begins</b>\n\n" +
-                "<i>The Duplicants built the 'Record Archive' to preserve the fruits of their research and the footprints of their inquiry. Then they launched the \"Incremental Insight Initiative\", known as \"Project III\": a grand plan to multiply and gather the crystals of knowledge that, for now, point in no direction.\n" +
+                "<i>The Duplicants built the 'Record Archive' to preserve the fruits of their research and the footprints of their inquiry. Then they launched the \"Incremental Insight Initiative\", known as \"Project III\": a grand plan to multiply and gather the crystals of knowledge that, for now, point in no vector.\n" +
                 "For the moment, most of the plan is nothing but pie in the sky. But if they never give up on persistence and accumulation, they may yet reach the sky...\n\n" +
                 "\"The aim of scholarship is not to find answers. It is to pose the right questions and get pleasantly lost.\"  - Albert L. Davoski</i>\n\n" +
                 "Research buildings keep working even though the research tree is complete, and their output is now turned into Insight.\n\n" +

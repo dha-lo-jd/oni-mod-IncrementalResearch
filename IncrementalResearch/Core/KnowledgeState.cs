@@ -120,16 +120,18 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public BigInteger ProducedScaled => produced;
 
     // Production multiplier from the Meta-Insight earned so far. Spending Meta-Insight does not lower it.
-    public double MetaInsightMultiplier =>
-        1d + (KnowledgeRules.MiMultiplierBase + KnowledgeRules.MiMultiplierPerExpansion * scaleMi) *
-        (double)metaInsightEarned;
+    public double MetaInsightMultiplier => 1d + KnowledgeRules.MiMultiplierBonus(
+        KnowledgeRules.MiMultiplierBase + KnowledgeRules.MiMultiplierPerExpansion * scaleMi, metaInsightEarned);
+
+    // Rate the idle game runs on; see KnowledgeRules.BaseRateReference.
+    private double EffectiveBaseRate => KnowledgeRules.EffectiveBaseRate(baseRate);
 
     public BigInteger MetaInsightGain => KnowledgeRules.MiGain(produced);
     public bool CanShift => MetaInsightGain >= 1;
     public BigInteger NextMiExpansionCost => KnowledgeRules.MiExpansionCost(scaleMi);
 
     public double ProductionTier1 =>
-        RecordArchive.AnyOperational ? baseRate * HoldingsTier1 * MultiplierTier1 * Performance(1) : 0d;
+        RecordArchive.AnyOperational ? EffectiveBaseRate * HoldingsTier1 * MultiplierTier1 * Performance(1) : 0d;
 
     public BigInteger NextExpansionCostScaled => NextExpansionCost(1);
 
@@ -308,7 +310,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
         if (def.Currency == UpgradeCurrency.Insight)
         {
-            knowledge -= def.CostAmount;
+            Spend(def.CostAmount);
         }
         else
         {
@@ -433,7 +435,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             return false;
         }
 
-        knowledge -= cost;
+        Spend(cost);
         switch (tier)
         {
             case 1: scaleTier1++; break;
@@ -500,10 +502,34 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         }
     }
 
+    // Infinite Insight is held as a fixed huge value: spending leaves it unchanged, and it is shown as "Infinity".
+    private void Spend(BigInteger amount)
+    {
+        if (knowledge >= KnowledgeRules.InfiniteScaled)
+        {
+            return;
+        }
+
+        knowledge -= amount;
+    }
+
     // Adds an amount in thousandths. The part below one thousandth is carried over to the next tick.
     private void AddProduction(double scaledAmount)
     {
-        if (double.IsNaN(scaledAmount) || double.IsInfinity(scaledAmount) || scaledAmount <= 0d)
+        if (double.IsPositiveInfinity(scaledAmount))
+        {
+            // The rate overflowed a double: the Insight held is infinite as well.
+            knowledge = KnowledgeRules.InfiniteScaled;
+            produced = KnowledgeRules.InfiniteScaled;
+            return;
+        }
+
+        if (double.IsNaN(scaledAmount) || scaledAmount <= 0d)
+        {
+            return;
+        }
+
+        if (knowledge >= KnowledgeRules.InfiniteScaled)
         {
             return;
         }
@@ -549,13 +575,21 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     // Performance per second that the facility of a tier (2 or 3) builds up for the tier below, as things stand.
     public double BonusRate(int tier)
     {
+        // The Meta-Insight multiplier is deliberately left out: it already multiplies the production of the
+        // tier below, and counting it here as well would make it compound with itself and run away.
         if (tier == 2)
         {
-            return KnowledgeRules.BonusRateTier2 * baseRate * Holdings(2) * TierMultiplier(2) * Performance(2) *
-                   activityTier2;
+            return KnowledgeRules.BonusRateTier2 * EffectiveBaseRate * Holdings(2) * BuildUpMultiplier(2) *
+                   Performance(2) * activityTier2;
         }
 
-        return KnowledgeRules.BonusRateTier3 * baseRate * Holdings(3) * TierMultiplier(3) * activityTier3;
+        return KnowledgeRules.BonusRateTier3 * EffectiveBaseRate * Holdings(3) * BuildUpMultiplier(3) *
+               activityTier3;
+    }
+
+    private double BuildUpMultiplier(int tier)
+    {
+        return ProductionMultiplier(tier) * SchoolMultiplier(tier);
     }
 
     private static double ApproachActivity(double activity, bool running, float dt)
