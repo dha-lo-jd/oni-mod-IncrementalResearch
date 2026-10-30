@@ -15,6 +15,10 @@ public enum UpgradeEffect
     StartingKnowledge,
     // Buys affordable Insight upgrades automatically.
     AutoBuyUpgrades,
+    // Buys Insight expansions automatically while affordable.
+    AutoExpandInsight,
+    // Buys Meta-Insight expansions automatically while affordable.
+    AutoExpandMetaInsight,
     // Unlocks a convenience feature, identified by the upgrade id.
     Convenience,
 }
@@ -43,6 +47,8 @@ public sealed class UpgradeDef
     // ...and the colony has made this many paradigm shifts.
     public int RequiredShifts;
     public string RequiredUpgradeId;
+    // Kept by a paradigm shift even though it is bought with Insight (the automation upgrades).
+    public bool PersistsOnShift;
 
     public bool IsGlobal => Tier == 0;
 
@@ -59,6 +65,8 @@ public static class Upgrades
     public const string Shelving = "T1_SHELVING";
     public const string Bulk = "T1_BULK";
     public const string Network = "G_NETWORK";
+    public const string AutoExpand = "T1_AUTO_EXPAND";
+    public const string AutoExpandMi = "M_AUTO_EXPAND";
     public const string HeadStart = "M_HEADSTART";
     public const string Discount = "M_DISCOUNT";
     public const string AutoUpgrade = "M_AUTO_UPGRADE";
@@ -99,6 +107,12 @@ public static class Upgrades
         },
         new UpgradeDef
         {
+            Id = AutoExpand, Name = STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.DESC, Tier = 1, Cost = 2000,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
             Id = HeadStart, Name = STRINGS.UI.UPGRADES.M_HEADSTART.NAME, Description = STRINGS.UI.UPGRADES.M_HEADSTART.DESC,
             Currency = UpgradeCurrency.MetaInsight, Tier = 0, Cost = 3, Effect = UpgradeEffect.StartingKnowledge,
             Value = 100d, RequiredShifts = 1,
@@ -114,6 +128,12 @@ public static class Upgrades
             Id = AutoUpgrade, Name = STRINGS.UI.UPGRADES.M_AUTO_UPGRADE.NAME,
             Description = STRINGS.UI.UPGRADES.M_AUTO_UPGRADE.DESC, Currency = UpgradeCurrency.MetaInsight, Tier = 0,
             Cost = 20, Effect = UpgradeEffect.AutoBuyUpgrades, Value = 0d, RequiredShifts = 3,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandMi, Name = STRINGS.UI.UPGRADES.M_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.M_AUTO_EXPAND.DESC, Currency = UpgradeCurrency.MetaInsight, Tier = 0,
+            Cost = 15, Effect = UpgradeEffect.AutoExpandMetaInsight, Value = 0d, RequiredShifts = 2,
         },
     };
 }

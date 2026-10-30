@@ -366,3 +366,19 @@ msgstr "学派"
 msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE6_BODY"
 msgid "The colony has shifted often enough to form schools of thought. At each paradigm shift you can now choose a school for the next cycle: each favors some tiers of facilities over others. You may also choose none."
 msgstr "パラダイムシフトを何度も重ねて、コロニーに学派が生まれました。これからは、シフトのたびに次の周回の学派を選べます。学派ごとに、得意な階層の設備が違います。学派を選ばなくても構いません。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.NAME"
+msgid "Auto-Cataloging"
+msgstr "自動目録化"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Record Archive whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときに記録保管庫を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_AUTO_EXPAND.NAME"
+msgid "Automated Theorizing"
+msgstr "理論の自動構築"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_AUTO_EXPAND.DESC"
+msgid "Automatically builds theories whenever affordable."
+msgstr "買えるときに理論を自動で積む。"

@@ -324,7 +324,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
                 continue;
             }
 
-            if (def.Currency == UpgradeCurrency.Insight)
+            if (def.Currency == UpgradeCurrency.Insight && !def.PersistsOnShift)
             {
                 upgrades.Remove(def.Id);
             }
@@ -379,6 +379,13 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
         AddProduction(ProductionTier1 * KnowledgeRules.Scale * dt);
 
+        if (HasUpgrade(Upgrades.AutoExpandMi))
+        {
+            while (TryExpandMi())
+            {
+            }
+        }
+
         if (HasUpgrade(Upgrades.AutoUpgrade))
         {
             foreach (var def in Upgrades.All)
@@ -388,6 +395,12 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
                     TryBuyUpgrade(def);
                 }
             }
+        }
+
+        // Upgrades come first, then expansions with what is left.
+        if (HasUpgrade(Upgrades.AutoExpand))
+        {
+            TryExpandTier1Many(int.MaxValue);
         }
 
         var newIdleMode = researchComplete && RecordArchive.AnyOperational;

@@ -117,6 +117,18 @@ public static class STRINGS
                 public static LocString DESC = "Automatically buys affordable Insight upgrades.";
             }
 
+            public static class T1_AUTO_EXPAND
+            {
+                public static LocString NAME = "Auto-Cataloging";
+                public static LocString DESC = "Automatically expands the Record Archive whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class M_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Theorizing";
+                public static LocString DESC = "Automatically builds theories whenever affordable.";
+            }
+
             public static class G_NETWORK
             {
                 public static LocString NAME = "Record Network";
