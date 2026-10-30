@@ -52,6 +52,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private string pickedSchool;
     private bool schoolPickInitialized;
     private RectTransform scrollContent;
+    private ScrollRect scrollRect;
     private LocText paradigmHeader;
     private LocText miLabel;
     private LocText miUnitLabel;
@@ -147,8 +148,13 @@ internal sealed class IdleResearchTab : MonoBehaviour
         scroll.content = content;
         scroll.horizontal = false;
         scroll.vertical = true;
-        scroll.movementType = ScrollRect.MovementType.Clamped;
+        // Rubber-band scrolling, as in the skills and research screens.
+        scroll.movementType = ScrollRect.MovementType.Elastic;
+        scroll.elasticity = 0.1f;
+        scroll.inertia = true;
+        scroll.decelerationRate = 0.135f;
         scroll.scrollSensitivity = 40f;
+        scrollRect = scroll;
 
         UiFactory.CreateLabel(content, STRINGS.UI.TAB.TITLE, 40f, 30f, 600f, 40f, fontSize: 28f);
         insightLabel = UiFactory.CreateLabel(content, "", 40f, 90f, 600f, 30f, fontSize: 22f);
@@ -347,6 +353,13 @@ internal sealed class IdleResearchTab : MonoBehaviour
 
     private void Update()
     {
+        // Leave the layout alone while the content is moving, so the scrolling stays smooth.
+        if (panel.activeSelf && scrollRect != null &&
+            (Mathf.Abs(Input.mouseScrollDelta.y) > 0f || scrollRect.velocity.sqrMagnitude > 1f))
+        {
+            nextRefresh = Mathf.Max(nextRefresh, Time.unscaledTime + RefreshInterval);
+        }
+
         if (Time.unscaledTime < nextRefresh)
         {
             return;
