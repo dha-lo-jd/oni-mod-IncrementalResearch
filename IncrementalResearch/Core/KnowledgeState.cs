@@ -365,6 +365,14 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         metaInsightEarned += amount;
     }
 
+    // Debug: while set, production is infinite. Not saved, so it ends with the session.
+    public bool DebugInfiniteProduction { get; private set; }
+
+    public void DebugToggleInfiniteProduction()
+    {
+        DebugInfiniteProduction = !DebugInfiniteProduction;
+    }
+
     public void DebugResetTutorial()
     {
         tutorialStage = 0;
@@ -499,7 +507,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         baseRate += (pendingPoints / dt - baseRate) * alpha;
         pendingPoints = 0f;
 
-        AddProduction(ProductionTier1 * KnowledgeRules.Scale * dt);
+        AddProduction(DebugInfiniteProduction ? double.PositiveInfinity : ProductionTier1 * KnowledgeRules.Scale * dt);
 
         if (IsAutomationActive(Upgrades.AutoExpandMi))
         {

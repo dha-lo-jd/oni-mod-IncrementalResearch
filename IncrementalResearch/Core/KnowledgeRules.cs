@@ -23,7 +23,22 @@ public static class KnowledgeRules
     // Cost of the next expansion, in thousandths of Insight.
     public static BigInteger ExpansionCost(int expansions, double growth = ScaleCostGrowth, double baseFactor = 1d)
     {
-        return new BigInteger(Math.Floor(ScaleBaseCost * baseFactor * Math.Pow(growth, expansions) * Scale));
+        return GrownCost(ScaleBaseCost * baseFactor * Scale, growth, expansions);
+    }
+
+    // base * growth^n as an integer. Goes through logarithms once the value no longer fits a double.
+    private static BigInteger GrownCost(double baseCost, double growth, int n)
+    {
+        var value = baseCost * Math.Pow(growth, n);
+        if (!double.IsInfinity(value) && value < 1e300d)
+        {
+            return new BigInteger(Math.Floor(value));
+        }
+
+        var lg = Math.Log10(baseCost) + n * Math.Log10(growth);
+        var exponent = (int)Math.Floor(lg);
+        var mantissa = Math.Pow(10d, lg - exponent);
+        return new BigInteger(mantissa * 1e15d) * BigInteger.Pow(10, Math.Max(exponent - 15, 0));
     }
 
     // Paradigm shift. See docs/spec-paradigm-shift.md.
@@ -135,12 +150,12 @@ public static class KnowledgeRules
 
     public static BigInteger TierExpansionCost(int tier, int expansions, double growth, double baseFactor)
     {
-        return new BigInteger(Math.Floor(BaseCost(tier) * baseFactor * Math.Pow(growth, expansions) * Scale));
+        return GrownCost(BaseCost(tier) * baseFactor * Scale, growth, expansions);
     }
 
     public static BigInteger MiExpansionCost(int expansions)
     {
-        return new BigInteger(Math.Floor(MiExpansionBaseCost * Math.Pow(MiExpansionCostGrowth, expansions)));
+        return GrownCost(MiExpansionBaseCost, MiExpansionCostGrowth, expansions);
     }
 
     public static float PointWeight(string researchTypeId)

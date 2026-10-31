@@ -294,6 +294,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
                      ("+1e9", () => KnowledgeState.Instance?.DebugAddInsight(1000000000)),
                      ("+10 MI", () => KnowledgeState.Instance?.DebugAddMetaInsight(10)),
                      ("Reset tutorial", () => KnowledgeState.Instance?.DebugResetTutorial()),
+                     ("Infinite on/off", () => KnowledgeState.Instance?.DebugToggleInfiniteProduction()),
                  })
         {
             var width = text.Length > 8 ? 200f : 100f;
