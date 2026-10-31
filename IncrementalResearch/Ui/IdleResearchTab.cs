@@ -62,6 +62,9 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private Button miExpandButton;
     private LocText miExpandLabel;
     private LocText purchasedLabel;
+    private LocText automationHeader;
+    private readonly List<(UpgradeDef def, Button button, LocText label)> automationToggles =
+        new List<(UpgradeDef, Button, LocText)>();
     private readonly List<UpgradeRow> upgradeRows = new List<UpgradeRow>();
     // Everything below the tier blocks; moves down as the upper tiers are unlocked.
     private RectTransform lower;
@@ -207,6 +210,21 @@ internal sealed class IdleResearchTab : MonoBehaviour
             upgradeRows.Add(row);
         }
 
+        automationHeader = UiFactory.CreateLabel(lower, STRINGS.UI.UPGRADES.AUTOMATION_HEADER, 40f, 0f, 600f, 34f,
+            fontSize: 22f);
+        foreach (var def in Upgrades.All)
+        {
+            if (!def.IsAutomation)
+            {
+                continue;
+            }
+
+            var captured = def;
+            var toggle = UiFactory.CreateButton(lower, "", 60f, 0f, 520f, 40f, () => ToggleAutomation(captured),
+                out var label);
+            automationToggles.Add((def, toggle, label));
+        }
+
         purchasedLabel = UiFactory.CreateLabel(lower, "", 60f, 0f, 960f, 30f);
 
         BuildDebugRow(viewport);
@@ -342,6 +360,12 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private void ExpandMi()
     {
         KnowledgeState.Instance?.TryExpandMi();
+        Refresh();
+    }
+
+    private void ToggleAutomation(UpgradeDef def)
+    {
+        KnowledgeState.Instance?.ToggleAutomation(def.Id);
         Refresh();
     }
 
@@ -544,6 +568,35 @@ internal sealed class IdleResearchTab : MonoBehaviour
                 ? string.Format(STRINGS.UI.UPGRADES.BUY, NumberFormat.FormatScaled(row.Def.CostAmount))
                 : string.Format(STRINGS.UI.UPGRADES.BUY_MI, NumberFormat.FormatWhole(row.Def.CostAmount)));
             SetInteractable(row.Buy, state.CanBuyUpgrade(row.Def));
+        }
+
+        var anyAutomation = false;
+        foreach (var (def, _, _) in automationToggles)
+        {
+            anyAutomation |= state.HasUpgrade(def.Id);
+        }
+
+        automationHeader.gameObject.SetActive(anyAutomation);
+        if (anyAutomation)
+        {
+            UiFactory.Place((RectTransform)automationHeader.transform, 40f, y + 10f, 600f, 34f);
+            y += 50f;
+        }
+
+        foreach (var (def, button, label) in automationToggles)
+        {
+            var owned = state.HasUpgrade(def.Id);
+            button.gameObject.SetActive(owned);
+            if (!owned)
+            {
+                continue;
+            }
+
+            UiFactory.Place((RectTransform)button.transform, 60f, y + 10f, 520f, 40f);
+            y += 48f;
+            SetText(label, string.Format(
+                state.IsAutomationEnabled(def.Id) ? STRINGS.UI.UPGRADES.AUTO_ON : STRINGS.UI.UPGRADES.AUTO_OFF,
+                def.Name.text));
         }
 
         var names = new List<string>();

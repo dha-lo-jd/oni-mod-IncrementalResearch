@@ -15,7 +15,7 @@ public enum UpgradeEffect
     StartingKnowledge,
     // Buys affordable Insight upgrades automatically.
     AutoBuyUpgrades,
-    // Buys Insight expansions automatically while affordable.
+    // Buys Insight expansions of the tier of the upgrade automatically while affordable.
     AutoExpandInsight,
     // Buys Meta-Insight expansions automatically while affordable.
     AutoExpandMetaInsight,
@@ -52,6 +52,10 @@ public sealed class UpgradeDef
 
     public bool IsGlobal => Tier == 0;
 
+    // Automation can be switched on and off by the player.
+    public bool IsAutomation => Effect == UpgradeEffect.AutoBuyUpgrades || Effect == UpgradeEffect.AutoExpandInsight ||
+                                Effect == UpgradeEffect.AutoExpandMetaInsight;
+
     // Insight is held in thousandths (KnowledgeRules.Scale); Meta-Insight in whole units.
     public BigInteger CostAmount =>
         Currency == UpgradeCurrency.Insight ? new BigInteger(Cost) * KnowledgeRules.Scale : new BigInteger(Cost);
@@ -71,6 +75,8 @@ public static class Upgrades
     public const string Isolation = "T3_ISOLATION";
     public const string Chamber = "T3_CHAMBER";
     public const string AutoExpand = "T1_AUTO_EXPAND";
+    public const string AutoExpandT2 = "T2_AUTO_EXPAND";
+    public const string AutoExpandT3 = "T3_AUTO_EXPAND";
     public const string AutoExpandMi = "M_AUTO_EXPAND";
     public const string HeadStart = "M_HEADSTART";
     public const string Discount = "M_DISCOUNT";
@@ -104,6 +110,7 @@ public static class Upgrades
         {
             Id = Bulk, Name = STRINGS.UI.UPGRADES.T1_BULK.NAME, Description = STRINGS.UI.UPGRADES.T1_BULK.DESC,
             Tier = 1, Cost = 300, Effect = UpgradeEffect.Convenience, Value = 0d, RequiredExpansions = 5,
+            PersistsOnShift = true,
         },
         new UpgradeDef
         {
@@ -140,6 +147,18 @@ public static class Upgrades
         {
             Id = AutoExpand, Name = STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.NAME,
             Description = STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.DESC, Tier = 1, Cost = 2000,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandT2, Name = STRINGS.UI.UPGRADES.T2_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T2_AUTO_EXPAND.DESC, Tier = 2, Cost = 300000,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandT3, Name = STRINGS.UI.UPGRADES.T3_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T3_AUTO_EXPAND.DESC, Tier = 3, Cost = 400000000,
             Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
         },
         new UpgradeDef

@@ -84,6 +84,9 @@ public static class STRINGS
             public static LocString BULK_TEN = "x10";
             public static LocString BULK_MAX = "Max";
             public static LocString AVAILABLE_TOOLTIP = "Upgrades available: {0}";
+            public static LocString AUTOMATION_HEADER = "Automation";
+            public static LocString AUTO_ON = "{0}: ON";
+            public static LocString AUTO_OFF = "{0}: OFF";
 
             public static class T1_INDEX
             {
@@ -112,7 +115,7 @@ public static class STRINGS
             public static class T1_BULK
             {
                 public static LocString NAME = "Bulk Expansion";
-                public static LocString DESC = "Adds x10 and Max buttons for expanding.";
+                public static LocString DESC = "Adds x10 and Max buttons for expanding (Max buys up to 1000 at a time). Kept through paradigm shifts.";
             }
 
             public static class M_HEADSTART
@@ -137,6 +140,18 @@ public static class STRINGS
             {
                 public static LocString NAME = "Auto-Cataloging";
                 public static LocString DESC = "Automatically expands the Record Archive whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class T2_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Computation";
+                public static LocString DESC = "Automatically expands the Compute Room whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class T3_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Experiments";
+                public static LocString DESC = "Automatically expands the Vacuum Lab whenever affordable. Kept through paradigm shifts.";
             }
 
             public static class M_AUTO_EXPAND

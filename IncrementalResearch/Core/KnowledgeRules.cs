@@ -10,6 +10,10 @@ public static class KnowledgeRules
     // thousandth are dropped (carried over per tick), so no floating point error builds up in the stored amount.
     public const int Scale = 1000;
 
+    // Most expansions bought in one go (the Max button, and automatic purchasing in one tick). Expansion costs
+    // grow exponentially, so this is rarely reached; it only keeps a huge stockpile from stalling the game.
+    public const int MaxExpansionsPerAction = 1000;
+
     public const double ScaleBaseCost = 10d;
     public const double ScaleCostGrowth = 1.15d;
 

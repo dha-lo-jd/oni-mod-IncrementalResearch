@@ -24,6 +24,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private int tutorialStage;
     // Ids of the purchased upgrades, comma separated.
     [Serialize] private string upgradesText = "";
+    // Ids of the automation upgrades the player has switched off, comma separated.
+    [Serialize] private string automationOffText = "";
     // Paradigm shift (see docs/spec-paradigm-shift.md). Big numbers are saved as text.
     [Serialize] private string producedText = "0";
     [Serialize] private string metaInsightText = "0";
@@ -58,6 +60,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     private bool tutorialDialogOpen;
     private bool buildMenuRefreshed;
     private readonly HashSet<string> upgrades = new HashSet<string>();
+    private readonly HashSet<string> automationOff = new HashSet<string>();
+    private const int MaxAutoPurchasesPerTick = KnowledgeRules.MaxExpansionsPerAction;
 
     public BigInteger KnowledgeScaled => knowledge;
     public int ScaleTier1 => scaleTier1;
@@ -197,6 +201,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     {
         knowledgeText = knowledge.ToString();
         upgradesText = string.Join(",", upgrades);
+        automationOffText = string.Join(",", automationOff);
         producedText = produced.ToString();
         metaInsightText = metaInsight.ToString();
         metaInsightEarnedText = metaInsightEarned.ToString();
@@ -231,6 +236,12 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             upgrades.Add(id);
         }
 
+        automationOff.Clear();
+        foreach (var id in (automationOffText ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            automationOff.Add(id);
+        }
+
         // Saves that counted the dialogs shown so far.
         if (tutorialFlags == 0 && tutorialStage > 0)
         {
@@ -252,6 +263,25 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public bool HasUpgrade(string id)
     {
         return upgrades.Contains(id);
+    }
+
+    // An automation is active when it is bought and the player has not switched it off.
+    public bool IsAutomationActive(string id)
+    {
+        return HasUpgrade(id) && !automationOff.Contains(id);
+    }
+
+    public bool IsAutomationEnabled(string id)
+    {
+        return !automationOff.Contains(id);
+    }
+
+    public void ToggleAutomation(string id)
+    {
+        if (!automationOff.Remove(id))
+        {
+            automationOff.Add(id);
+        }
     }
 
     // Product of the production multipliers that apply to a tier: its own upgrades and the global ones.
@@ -449,6 +479,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     // Expands up to the given number of times (or as often as affordable); returns how many were bought.
     public int TryExpandMany(int tier, int maxCount)
     {
+        maxCount = Math.Min(maxCount, KnowledgeRules.MaxExpansionsPerAction);
         var bought = 0;
         while (bought < maxCount && TryExpand(tier))
         {
@@ -470,14 +501,14 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
         AddProduction(ProductionTier1 * KnowledgeRules.Scale * dt);
 
-        if (HasUpgrade(Upgrades.AutoExpandMi))
+        if (IsAutomationActive(Upgrades.AutoExpandMi))
         {
-            while (TryExpandMi())
+            for (var i = 0; i < MaxAutoPurchasesPerTick && TryExpandMi(); i++)
             {
             }
         }
 
-        if (HasUpgrade(Upgrades.AutoUpgrade))
+        if (IsAutomationActive(Upgrades.AutoUpgrade))
         {
             foreach (var def in Upgrades.All)
             {
@@ -489,16 +520,44 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         }
 
         // Upgrades come first, then expansions with what is left.
-        if (HasUpgrade(Upgrades.AutoExpand))
-        {
-            TryExpandTier1Many(int.MaxValue);
-        }
+        AutoExpand();
 
         var newIdleMode = researchComplete && RecordArchive.AnyOperational;
         if (newIdleMode != idleMode)
         {
             idleMode = newIdleMode;
             RefreshResearchCenters();
+        }
+    }
+
+    // Expands the tiers that have automation, always the cheapest affordable expansion first, so that no tier
+    // starves the others.
+    private void AutoExpand()
+    {
+        for (var i = 0; i < MaxAutoPurchasesPerTick; i++)
+        {
+            var best = 0;
+            BigInteger bestCost = BigInteger.Zero;
+            foreach (var def in Upgrades.All)
+            {
+                if (def.Effect != UpgradeEffect.AutoExpandInsight || !IsAutomationActive(def.Id) ||
+                    !CanExpand(def.Tier))
+                {
+                    continue;
+                }
+
+                var cost = NextExpansionCost(def.Tier);
+                if (best == 0 || cost < bestCost)
+                {
+                    best = def.Tier;
+                    bestCost = cost;
+                }
+            }
+
+            if (best == 0 || !TryExpand(best))
+            {
+                return;
+            }
         }
     }
 

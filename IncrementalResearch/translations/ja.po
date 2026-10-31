@@ -224,8 +224,8 @@ msgid "Bulk Expansion"
 msgstr "一括拡張"
 
 msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_BULK.DESC"
-msgid "Adds x10 and Max buttons for expanding."
-msgstr "拡張に「×10」「最大」のボタンが加わる。"
+msgid "Adds x10 and Max buttons for expanding (Max buys up to 1000 at a time). Kept through paradigm shifts."
+msgstr "拡張に「×10」「最大」のボタンが加わる(最大は一度に1000回まで)。パラダイムシフトでも失われない。"
 
 msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.G_NETWORK.NAME"
 msgid "Record Network"
@@ -396,6 +396,34 @@ msgstr "自動目録化"
 msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T1_AUTO_EXPAND.DESC"
 msgid "Automatically expands the Record Archive whenever affordable. Kept through paradigm shifts."
 msgstr "買えるときに記録保管庫を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T2_AUTO_EXPAND.NAME"
+msgid "Automated Computation"
+msgstr "自動演算"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T2_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Compute Room whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときに計算機室を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T3_AUTO_EXPAND.NAME"
+msgid "Automated Experiments"
+msgstr "自動実験"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T3_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Vacuum Lab whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときに真空実験室を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.AUTOMATION_HEADER"
+msgid "Automation"
+msgstr "自動化"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.AUTO_ON"
+msgid "{0}: ON"
+msgstr "{0}: オン"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.AUTO_OFF"
+msgid "{0}: OFF"
+msgstr "{0}: オフ"
 
 msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.M_AUTO_EXPAND.NAME"
 msgid "Automated Theorizing"
