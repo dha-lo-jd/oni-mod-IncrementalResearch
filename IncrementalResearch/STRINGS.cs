@@ -70,7 +70,7 @@ public static class STRINGS
                 "<b>Duplicants Love a Vacuum</b>\n\n" +
                 "<i>Is there something \"in\" a vacuum? Whatever the philosophers say, the hole of a giant donut is perfect for all manner of research. It would be far more unnatural to dislike such a convenient thing. At any rate, a room packed with vacuum like sardines should fill our tin cans with Insight as well.\n\n\n" +
                 "\"Make the air clean. Yes, take it out.\"  - Albert L. Davoski</i>\n\n" +
-                "The Compute Room has been expanded far enough to draw up the next facility. The Vacuum Lab (Equipment menu, Research tab) is now available. It needs a vacuum around it, and heat does not escape in a vacuum, so mind its temperature. While it runs, it builds up the performance of the Compute Room.";
+                "The Compute Room has been expanded far enough to draw up the next facility. The Vacuum Lab (Equipment menu, Research tab) is now available. It needs a vacuum around it, and heat does not escape in a vacuum, so mind its temperature (it gives off more heat the more you expand it). While it runs, it builds up the performance of the Compute Room.";
             public static LocString STAGE3_BODY =
                 "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more.";
         }
@@ -248,7 +248,7 @@ public static class STRINGS
             public static LocString NOT_VACUUM_NAME = "Not a vacuum";
             public static LocString NOT_VACUUM_TOOLTIP = "The Vacuum Lab only runs when every cell it occupies is thin enough. Its activity is falling.";
             public static LocString REQUIRE_TEMPERATURE = "Runs at {0} C or below. Extra heat from expansion: +{1} kDTU/s (grows as it is expanded, up to a limit)";
-            public static LocString REQUIRE_MASS = "Runs when every occupied cell holds {0} g of gas or less";
+            public static LocString REQUIRE_MASS = "Runs when every occupied cell holds {0} g of gas or less. Extra heat from expansion: +{1} kDTU/s (grows as it is expanded, up to a limit)";
             public static LocString STATUS_TOOLTIP = "Insight: {0}\n{1}: {2}\nActivity: {3}%\nPerformance given to the tier below: x{4}";
             public static LocString HEADER_BONUS = "Performance: x{0} (built up: {1}, activity: {2}%)";
             public static LocString PRODUCTION_RATE = "Build-up: +{0}/s";
@@ -281,7 +281,7 @@ public static class STRINGS
                 public static LocString NAME = "Vacuum Lab";
                 public static LocString DESC = "A sealed laboratory where experiments need nothing in the way.";
                 public static LocString EFFECT =
-                    "Builds up the performance of the Compute Room while running. Runs only when every cell it occupies is thin enough.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+                    "Builds up the performance of the Compute Room while running. Runs only when every cell it occupies is thin enough, and gives off more heat the more it is expanded.\n\nIts activity falls while stopped, but the built-up performance is kept.";
             }
 
             public static class IR_RECORDARCHIVE

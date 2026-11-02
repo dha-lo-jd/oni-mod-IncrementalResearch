@@ -42,8 +42,11 @@ public sealed class VacuumLab : TierFacility
 
     private const float MaxCellMass = KnowledgeRules.VacuumLabMaxCellMass;
 
+    protected override float ExtraHeatKilowatts =>
+        KnowledgeRules.VacuumLabExtraHeat(KnowledgeState.Instance?.Holdings(3) ?? 0);
+
     protected override string EnvironmentRequirement => string.Format(STRINGS.UI.TIERS.REQUIRE_MASS,
-        NumberFormat.Format(MaxCellMass * 1000f));
+        NumberFormat.Format(MaxCellMass * 1000f), NumberFormat.Format(ExtraHeatKilowatts));
 
     protected override StatusItem FindProblem()
     {

@@ -134,7 +134,10 @@ public static class KnowledgeRules
     public const float ComputeRoomMaxTemperature = 303.15f;
     // Extra self heat (kW = kDTU/s) of the Compute Room at the cap, on top of the building's own.
     public const float ComputeRoomExtraHeatAtCap = 16f;
-    // Most gas mass (kg) per cell at which the Vacuum Lab still runs. Not tightened for now.
+    // Extra self heat (kW = kDTU/s) of the Vacuum Lab at the cap. Higher than the Compute Room's, because heat
+    // cannot leave a vacuum except through conduction.
+    public const float VacuumLabExtraHeatAtCap = 24f;
+    // Most gas mass (kg) per cell at which the Vacuum Lab still runs.
     public const float VacuumLabMaxCellMass = 0.05f;
 
     private static double TightenProgress(int holdings)
@@ -146,6 +149,12 @@ public static class KnowledgeRules
     public static float ComputeRoomExtraHeat(int holdings)
     {
         return ComputeRoomExtraHeatAtCap * (float)TightenProgress(holdings);
+    }
+
+    // Extra heat (kW) the Vacuum Lab gives off while running, growing linearly with its holdings up to the cap.
+    public static float VacuumLabExtraHeat(int holdings)
+    {
+        return VacuumLabExtraHeatAtCap * (float)TightenProgress(holdings);
     }
 
     public static BigInteger TierExpansionCost(int tier, int expansions, double growth, double baseFactor)
