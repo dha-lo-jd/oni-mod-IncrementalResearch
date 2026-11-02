@@ -35,6 +35,8 @@ internal sealed class IdleResearchTab : MonoBehaviour
 
     private LocText insightLabel;
     private LocText baseRateLabel;
+    private LocText rateLabel;
+    private LocText metaLabel;
     private LocText statusLabel;
     private LocText unitLabel;
     private LocText productionLabel;
@@ -160,13 +162,29 @@ internal sealed class IdleResearchTab : MonoBehaviour
         scrollRect = scroll;
 
         UiFactory.CreateLabel(content, STRINGS.UI.TAB.TITLE, 40f, 30f, 600f, 40f, fontSize: 28f);
-        insightLabel = UiFactory.CreateLabel(content, "", 40f, 90f, 600f, 30f, fontSize: 22f);
-        baseRateLabel = UiFactory.CreateLabel(content, "", 40f, 125f, 600f, 30f);
-        statusLabel = UiFactory.CreateLabel(content, "", 40f, 160f, 900f, 30f);
+        // Summary card: Insight, its rate and Meta-Insight, in the same colors as the readout on the main screen.
+        var card = UiFactory.CreateRect("SummaryCard", content, 30f, 78f, 1020f, 108f);
+        card.gameObject.AddComponent<Image>().color = UiFactory.CardColor;
+        var accent = UiFactory.CreateRect("Accent", card, 0f, 0f, 8f, 108f).gameObject.AddComponent<Image>();
+        accent.color = UiFactory.InsightColor;
+        insightLabel = UiFactory.CreateLabel(card, "", 28f, 6f, 970f, 56f, TextAlignmentOptions.MidlineLeft, 40f);
+        insightLabel.color = UiFactory.InsightColor;
+        UiFactory.SetAutoSize(insightLabel, 18f, 40f);
+        rateLabel = UiFactory.CreateLabel(card, "", 28f, 64f, 560f, 36f, TextAlignmentOptions.MidlineLeft, 26f);
+        rateLabel.color = UiFactory.RateColor;
+        UiFactory.SetAutoSize(rateLabel, 12f, 26f);
+        metaLabel = UiFactory.CreateLabel(card, "", 610f, 64f, 390f, 36f, TextAlignmentOptions.MidlineRight, 26f);
+        metaLabel.color = UiFactory.MetaColor;
+        UiFactory.SetAutoSize(metaLabel, 12f, 26f);
+        baseRateLabel = UiFactory.CreateLabel(content, "", 40f, 194f, 380f, 30f);
+        UiFactory.SetAutoSize(baseRateLabel, 12f, 20f);
+        statusLabel = UiFactory.CreateLabel(content, "", 430f, 194f, 620f, 30f);
+        UiFactory.SetAutoSize(statusLabel, 12f, 20f);
 
         UiFactory.CreateLabel(content, STRINGS.UI.ARCHIVE.SIDESCREEN_TITLE, 40f, 230f, 600f, 34f, fontSize: 22f);
         unitLabel = UiFactory.CreateLabel(content, "", 60f, 270f, 600f, 30f);
         productionLabel = UiFactory.CreateLabel(content, "", 60f, 305f, 600f, 30f);
+        UiFactory.SetAutoSize(productionLabel, 12f, 20f);
         expandButton = UiFactory.CreateButton(content, "", 60f, 350f, 460f, 40f, Expand, out expandLabel);
 
         expandTenButton = UiFactory.CreateButton(content, STRINGS.UI.UPGRADES.BULK_TEN, 540f, 350f, 90f, 40f,
@@ -182,8 +200,10 @@ internal sealed class IdleResearchTab : MonoBehaviour
         lower = UiFactory.CreateRect("Lower", content, 0f, LowerTop, 1100f, 10f);
         paradigmHeader = UiFactory.CreateLabel(lower, STRINGS.UI.PARADIGM.HEADER, 40f, ParadigmTop, 600f, 34f, fontSize: 22f);
         miLabel = UiFactory.CreateLabel(lower, "", 60f, ParadigmTop + 40f, 960f, 30f);
+        UiFactory.SetAutoSize(miLabel, 12f, 20f);
         miUnitLabel = UiFactory.CreateLabel(lower, "", 60f, ParadigmTop + 75f, 400f, 30f);
         producedLabel = UiFactory.CreateLabel(lower, "", 460f, ParadigmTop + 75f, 560f, 30f);
+        UiFactory.SetAutoSize(producedLabel, 12f, 20f);
         shiftButton = UiFactory.CreateButton(lower, "", 60f, ParadigmTop + 115f, 380f, 40f, Shift, out shiftLabel);
         miExpandButton = UiFactory.CreateButton(lower, "", 460f, ParadigmTop + 115f, 460f, 40f, ExpandMi,
             out miExpandLabel);
@@ -322,6 +342,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
         block.Root = root.gameObject;
         block.Header = UiFactory.CreateLabel(root, Tiers.FacilityName(tier), 40f, 0f, 600f, 34f, fontSize: 22f);
         block.Info = UiFactory.CreateLabel(root, "", 60f, 40f, 1000f, 30f);
+        UiFactory.SetAutoSize(block.Info, 12f, 20f);
         block.Rate = UiFactory.CreateLabel(root, "", 60f, 75f, 600f, 30f);
         var capturedTier = tier;
         block.Expand = UiFactory.CreateButton(root, "", 60f, 115f, 460f, 40f,
@@ -451,7 +472,11 @@ internal sealed class IdleResearchTab : MonoBehaviour
             return;
         }
 
-        SetText(insightLabel, string.Format(STRINGS.UI.TAB.INSIGHT, NumberFormat.FormatScaled(state.KnowledgeScaled)));
+        SetText(insightLabel, string.Format(STRINGS.UI.HUD.INSIGHT, NumberFormat.FormatScaled(state.KnowledgeScaled)));
+        SetText(rateLabel, string.Format(STRINGS.UI.HUD.RATE, NumberFormat.Format(state.ProductionTier1)));
+        SetText(metaLabel, state.MetaInsightEarned > 0
+            ? string.Format(STRINGS.UI.HUD.MI, NumberFormat.FormatWhole(state.MetaInsight))
+            : "");
         SetText(baseRateLabel, string.Format(STRINGS.UI.TAB.BASE_RATE, NumberFormat.Format(state.BaseRate)));
         SetText(statusLabel, RecordArchive.AnyOperational ? STRINGS.UI.TAB.STATUS_ACTIVE : STRINGS.UI.TAB.STATUS_INACTIVE);
         SetText(unitLabel, string.Format(STRINGS.UI.TAB.UNIT_VALUE, STRINGS.UI.ARCHIVE.UNIT, state.HoldingsTier1));

@@ -22,8 +22,10 @@ public static class STRINGS
 
         public static class HUD
         {
-            public static LocString TEXT = "Insight: {0} (+{1}/s)";
-            public static LocString TEXT_MI = "Insight: {0} (+{1}/s)  MI: {2}";
+            // The caption is small and dim; the value takes the large, bright style.
+            public static LocString INSIGHT = "<size=55%><color=#9AA6C8>Insight</color></size>  {0}";
+            public static LocString RATE = "+{0}/s";
+            public static LocString MI = "<size=75%><color=#9AA6C8>MI</color></size>  {0}";
         }
 
         public static class SIDE

@@ -12,6 +12,11 @@ internal static class UiFactory
     public static readonly Color PanelColor = new(0.192f, 0.205f, 0.258f, 1f);
     public static readonly Color ButtonColor = new(0.243f, 0.263f, 0.341f, 1f);
     public static readonly Color ButtonDisabledColor = new(0.15f, 0.16f, 0.2f, 1f);
+    // Colors of the Insight readouts: Insight itself, its rate, and Meta-Insight.
+    public static readonly Color InsightColor = new(0.96f, 0.80f, 0.36f, 1f);
+    public static readonly Color RateColor = new(0.44f, 0.83f, 0.88f, 1f);
+    public static readonly Color MetaColor = new(0.71f, 0.55f, 1f, 1f);
+    public static readonly Color CardColor = new(0.13f, 0.14f, 0.19f, 1f);
 
     public static RectTransform CreateRect(string name, Transform parent, float x, float y, float width, float height)
     {
@@ -81,6 +86,16 @@ internal static class UiFactory
         label.textWrappingMode = TextWrappingModes.NoWrap;
         label.text = text;
         return label;
+    }
+
+    // Lets the text shrink to fit its rect, so that numbers with many digits never run out of their background.
+    public static void SetAutoSize(LocText label, float minSize, float maxSize)
+    {
+        label.enableAutoSizing = true;
+        label.fontSizeMin = minSize;
+        label.fontSizeMax = maxSize;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
+        label.overflowMode = TextOverflowModes.Ellipsis;
     }
 
     public static Button CreateButton(Transform parent, string text, float x, float y, float width, float height,

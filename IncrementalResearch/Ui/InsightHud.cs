@@ -10,16 +10,20 @@ namespace IncrementalResearch.Ui;
 internal sealed class InsightHud : MonoBehaviour
 {
     private const float RefreshInterval = 0.25f;
-    private const float Width = 840f;
-    private const float Height = 100f;
+    private const float Width = 640f;
+    private const float Height = 104f;
+    private const float AccentWidth = 8f;
     // Negative: the category bar rect reaches above its buttons.
     private const float Gap = -48f;
-    private const float FontSize = 42f;
+    private const float InsightMaxSize = 46f;
+    private const float RowMaxSize = 30f;
     private const float VisibleAlpha = 0.7f;
 
     private RectTransform rect;
     private RectTransform anchorRect;
-    private LocText label;
+    private LocText insightLabel;
+    private LocText rateLabel;
+    private LocText metaLabel;
     private CanvasGroup group;
     private float nextRefresh;
 
@@ -46,7 +50,23 @@ internal sealed class InsightHud : MonoBehaviour
         background.color = new Color(0.192f, 0.205f, 0.258f, 1f);
         background.raycastTarget = false;
 
-        hud.label = UiFactory.CreateLabel(hud.rect, "", 24f, 0f, Width - 48f, Height, TextAlignmentOptions.MidlineLeft, FontSize);
+        // A thin gold edge on the left marks the readout; the numbers sit in three colors on two rows.
+        var accent = UiFactory.CreateRect("Accent", hud.rect, 0f, 0f, AccentWidth, Height).gameObject.AddComponent<Image>();
+        accent.color = UiFactory.InsightColor;
+        accent.raycastTarget = false;
+        var textWidth = Width - AccentWidth - 32f;
+        hud.insightLabel = UiFactory.CreateLabel(hud.rect, "", AccentWidth + 16f, 6f, textWidth, 58f,
+            TextAlignmentOptions.MidlineLeft, InsightMaxSize);
+        hud.insightLabel.color = UiFactory.InsightColor;
+        UiFactory.SetAutoSize(hud.insightLabel, 18f, InsightMaxSize);
+        hud.rateLabel = UiFactory.CreateLabel(hud.rect, "", AccentWidth + 16f, 62f, textWidth * 0.55f, 36f,
+            TextAlignmentOptions.MidlineLeft, RowMaxSize);
+        hud.rateLabel.color = UiFactory.RateColor;
+        UiFactory.SetAutoSize(hud.rateLabel, 12f, RowMaxSize);
+        hud.metaLabel = UiFactory.CreateLabel(hud.rect, "", AccentWidth + 16f + textWidth * 0.58f, 62f,
+            textWidth * 0.42f, 36f, TextAlignmentOptions.MidlineRight, RowMaxSize);
+        hud.metaLabel.color = UiFactory.MetaColor;
+        UiFactory.SetAutoSize(hud.metaLabel, 12f, RowMaxSize);
         // Hidden by alpha rather than deactivated, so that Update keeps running.
         hud.group = go.AddComponent<CanvasGroup>();
         hud.group.alpha = 0f;
@@ -77,13 +97,21 @@ internal sealed class InsightHud : MonoBehaviour
             return;
         }
 
-        var knowledge = NumberFormat.FormatScaled(state.KnowledgeScaled);
-        var production = NumberFormat.Format(state.ProductionTier1);
+        SetText(insightLabel, string.Format(STRINGS.UI.HUD.INSIGHT, NumberFormat.FormatScaled(state.KnowledgeScaled)));
+        SetText(rateLabel, string.Format(STRINGS.UI.HUD.RATE, NumberFormat.Format(state.ProductionTier1)));
         // Meta-Insight is only mentioned once the colony has some.
-        label.text = state.MetaInsightEarned > 0
-            ? string.Format(STRINGS.UI.HUD.TEXT_MI, knowledge, production, NumberFormat.FormatWhole(state.MetaInsight))
-            : string.Format(STRINGS.UI.HUD.TEXT, knowledge, production);
+        SetText(metaLabel, state.MetaInsightEarned > 0
+            ? string.Format(STRINGS.UI.HUD.MI, NumberFormat.FormatWhole(state.MetaInsight))
+            : "");
         Place();
+    }
+
+    private static void SetText(LocText target, string value)
+    {
+        if (target.text != value)
+        {
+            target.text = value;
+        }
     }
 
     // Sits on the top left corner of the build menu's category bar.

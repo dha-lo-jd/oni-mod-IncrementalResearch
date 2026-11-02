@@ -51,19 +51,23 @@ U = [
  ("M_HEADSTART",0,3,"start",100,0,None,"M",1,True),
  ("M_DISCOUNT",1,8,"disc",0.5,0,None,"M",2,True),
 ]
-BASE = {1:10.0, 2:1000.0, 3:1e6}
-GROW = {1:1.15, 2:1.18, 3:1.22}
+# Tiers 4-7 are draft values (docs/spec-tiers-4-7.md); NT = number of tiers simulated.
+NT = 3
+BASE = {1:10.0, 2:1000.0, 3:1e6, 4:1e9, 5:1e12, 6:1e15, 7:1e18}
+GROW = {1:1.15, 2:1.18, 3:1.22, 4:1.25, 5:1.28, 6:1.31, 7:1.34}
+UNLOCK = {2:25, 3:15, 4:15, 5:15, 6:15, 7:15}   # expansions of the tier below
+BONUS = {2:0.002, 3:0.001, 4:0.0005, 5:0.00025, 6:0.0001, 7:0.00005}   # build-up rate of tier t on tier t-1
 
 def run(P, hours=100, dt=2.0, verbose=True, label=""):
     gain = P.gain or default_gain
     multf = P.mult or default_mult
     t = 0.0
-    ex = {1:0,2:0,3:0}
+    ex = {i:0 for i in range(1,NT+1)}
     ups = set(); mups = set()
     know = 0.0; T = 0.0
     Mearned = 0; Mspent = 0; smi = 0; shifts = 0
-    t2 = t3 = False
-    b1 = b2 = 0.0
+    unl = {i:(i==1) for i in range(1,NT+1)}
+    b = {i:0.0 for i in range(1,NT+1)}
     rows = []
     cycle_start = 0.0
     peakP = 0.0
@@ -90,7 +94,7 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
     def vis(u):
         if has(u[0]): return False
         sc = ex[1] if u[1]==0 else ex[u[1]]
-        if u[1]!=0 and not (t2 if u[1]==2 else t3 if u[1]==3 else True): return False
+        if u[1]!=0 and not unl.get(u[1],False): return False
         return sc>=u[5] and shifts>=u[8] and (u[6] is None or has(u[6]))
     def start_know():
         return 100.0 if has("M_HEADSTART") else 0.0
@@ -98,37 +102,36 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
     while t < end:
         Seff = P.Sref*(P.S/P.Sref)**P.gamma
         mi = multf(P, Mearned, smi)
-        n1,n2,n3 = ex[1]+1, ex[2]+1, ex[3]+1
-        mu1 = promul(1)*mi; mu2=promul(2)*mi; mu3=promul(3)*mi
-        bmi2 = mu2 if P.bonus_uses_mi else promul(2)
-        bmi3 = mu3 if P.bonus_uses_mi else promul(3)
-        E1 = 1+b1; E2 = 1+b2
+        n1 = ex[1]+1
+        mu1 = promul(1)*mi
+        E1 = 1+b[1]
         prod = Seff*n1*mu1*E1
         if math.isinf(prod) or prod>1e300:
             inf=True; break
         know += prod*dt; T += prod*dt
         peakP = prod
-        if t2: b1 += dt*P.bonus2*Seff*n2*bmi2*E2
-        if t3: b2 += dt*P.bonus3*Seff*n3*bmi3
+        for tt in range(NT,1,-1):
+            if unl[tt]:
+                mt = promul(tt)*(mi if P.bonus_uses_mi else 1.0)
+                Et = 1+b[tt] if tt<NT else 1.0
+                b[tt-1] += dt*BONUS[tt]*Seff*(ex[tt]+1)*mt*Et
         # purchases (greedy cheapest first)
         while True:
             opts = []
             for u in U:
                 if u[7]=="I" and vis(u) and u[2]<=know: opts.append((u[2],"u",u))
-            for tier in (1,2,3):
-                if tier==2 and not t2: continue
-                if tier==3 and not t3: continue
-                if tier==1 or True:
-                    c = cost(tier)
-                    if c<=know and (tier!=1 or True): opts.append((c,"e",tier))
+            for tier in range(1,NT+1):
+                if not unl[tier]: continue
+                c = cost(tier)
+                if c<=know: opts.append((c,"e",tier))
             if not opts: break
             opts.sort(key=lambda o:o[0])
             c,k,x = opts[0]
             know -= c
             if k=="u": ups.add(x[0])
             else: ex[x]+=1
-            if not t2 and ex[1]>=25: t2=True
-            if not t3 and ex[2]>=15: t3=True
+            for tt in range(2,NT+1):
+                if not unl[tt] and ex[tt-1]>=UNLOCK[tt]: unl[tt]=True
         # shift decision
         g = gain(P, T)
         cyc = t-cycle_start
@@ -146,9 +149,9 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
                 if c<=bal:
                     smi+=1; bal-=c; Mspent+=c; bought=True
                 if not bought: break
-            ex = {1:0,2:0,3:0}
+            ex = {i:0 for i in range(1,NT+1)}
             ups = set(u for u in ups if next(x for x in U if x[0]==u)[9])
-            b1=b2=0.0; T=0.0; know=start_know(); cycle_start=t
+            b = {i:0.0 for i in range(1,NT+1)}; T=0.0; know=start_know(); cycle_start=t
         t += dt
     if verbose:
         print("==",label,"S=",P.S,"inf" if inf else "", "t_end(h)=",round(t/3600,2),"shifts",shifts)
@@ -189,9 +192,15 @@ def slopes(rows):
     return "slope(decades/h) "+"/".join(out)+"  cycle(min)@10,25,50,100h="+"/".join("%.0f"%at(h)[2] for h in (10,25,50,100))
 
 
+import os
+for _t in range(4,8):
+    BONUS[_t] *= float(os.environ.get('BONUS_SCALE','0.02'))
+    BASE[_t] *= float(os.environ.get('BASE_SCALE','1e6'))
+
 if __name__=="__main__":
     S=float(sys.argv[1]) if len(sys.argv)>1 else 8.0
     H=float(sys.argv[2]) if len(sys.argv)>2 else 100.0
+    NT=int(sys.argv[3]) if len(sys.argv)>3 else 3
     # The shipped constants (KnowledgeRules.cs): T0, k, p0, cg, cm.
     P=make3(1e14,0.01,0.98,1e-4,5e-5,S=S,rho=4.0)
     rows,inf,t=run(P,hours=H,dt=15.0,verbose=False)
