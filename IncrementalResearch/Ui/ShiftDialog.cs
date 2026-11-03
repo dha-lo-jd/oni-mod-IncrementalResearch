@@ -22,7 +22,7 @@ internal static class ShiftDialog
         }
 
         dialog.SetHeader(STRINGS.UI.PARADIGM.CONFIRM_TITLE)
-            .AddPlainText(body)
+            .AddPlainText(RubyText.Convert(body))
             .AddOption(global::STRINGS.UI.CONFIRMDIALOG.CANCEL, d => d.Deactivate())
             .AddOption(STRINGS.UI.PARADIGM.CONFIRM_OK, d =>
             {

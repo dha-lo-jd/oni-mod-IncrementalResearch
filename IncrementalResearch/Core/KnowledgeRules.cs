@@ -103,25 +103,36 @@ public static class KnowledgeRules
     }
 
     // Tiers 2 and 3. See docs/spec-tiers-2-3.md.
-    public const int MaxTier = 3;
-    // Expansions of the tier below that unlock the blueprint of tier 2 and tier 3.
-    public const int Tier2UnlockExpansions = 25;
-    public const int Tier3UnlockExpansions = 15;
+    // Tiers 4 to 7: see docs/spec-tiers-4-7.md.
+    public const int MaxTier = 7;
+    // Expansions of the tier below that unlock the blueprint of a tier (index = tier; 0 and 1 unused).
+    private static readonly int[] UnlockExpansionsByTier = { 0, 0, 25, 15, 30, 30, 30, 30 };
     // How fast the upper tiers build up the performance of the tier below them.
-    public const double BonusRateTier2 = 0.002d;
-    public const double BonusRateTier3 = 0.001d;
+    private static readonly double[] BonusRateByTier = { 0d, 0d, 0.002d, 0.001d, 5e-6d, 2.5e-6d, 1e-6d, 5e-7d };
+    private static readonly double[] BaseCostByTier = { 0d, ScaleBaseCost, 1000d, 1e6d, 1e11d, 3e12d, 1e14d, 3e15d };
+    private static readonly double[] BaseGrowthByTier = { 0d, ScaleCostGrowth, 1.18d, 1.22d, 1.25d, 1.28d, 1.31d, 1.34d };
+
+    public static int UnlockExpansions(int tier)
+    {
+        return UnlockExpansionsByTier[tier];
+    }
+
+    public static double BonusRate(int tier)
+    {
+        return BonusRateByTier[tier];
+    }
     // Time constants (seconds) of the activity of a facility rising when it runs and falling when it stops.
     public const double ActivityRiseTime = 20d;
     public const double ActivityFallTime = 120d;
 
     public static double BaseCost(int tier)
     {
-        return tier == 1 ? ScaleBaseCost : tier == 2 ? 1000d : 1000000d;
+        return BaseCostByTier[tier];
     }
 
     public static double BaseGrowth(int tier)
     {
-        return tier == 1 ? ScaleCostGrowth : tier == 2 ? 1.18d : 1.22d;
+        return BaseGrowthByTier[tier];
     }
 
     // Insight at or above this (in thousandths) counts as infinite. Far beyond what a double rate can reach.
@@ -155,6 +166,55 @@ public static class KnowledgeRules
     public static float VacuumLabExtraHeat(int holdings)
     {
         return VacuumLabExtraHeatAtCap * (float)TightenProgress(holdings);
+    }
+
+    // Tier 4 and 5: electric power (kW) drawn while running, from the base at the first holdings to the cap.
+    public const float AcceleratorPowerBase = 1.6f;
+    public const float AcceleratorPowerAtCap = 10f;
+    public const float ConfinementPowerBase = 3.2f;
+    public const float ConfinementPowerAtCap = 24f;
+
+    private static float Lerp(float from, float to, int holdings)
+    {
+        return from + (to - from) * (float)TightenProgress(holdings - 1);
+    }
+
+    public static float AcceleratorPower(int holdings)
+    {
+        return Lerp(AcceleratorPowerBase, AcceleratorPowerAtCap, holdings);
+    }
+
+    public static float ConfinementPower(int holdings)
+    {
+        return Lerp(ConfinementPowerBase, ConfinementPowerAtCap, holdings);
+    }
+
+    // Tier 6: a clear band beside the facility, as tall as the facility. Total length in cells (left plus right).
+    public const int NetBandLengthBase = 8;
+    public const int NetBandLengthAtCap = 40;
+
+    public static int NetBandLength(int holdings)
+    {
+        return (int)Math.Round(NetBandLengthBase + (NetBandLengthAtCap - NetBandLengthBase) *
+            TightenProgress(holdings - 1));
+    }
+
+    // Tier 7: a clear rectangle from the base of the facility upward. Width includes the facility's own columns.
+    public const int FurnaceWidthBase = 8;
+    public const int FurnaceWidthAtCap = 32;
+    public const int FurnaceHeightBase = 4;
+    public const int FurnaceHeightAtCap = 16;
+
+    public static int FurnaceWidth(int holdings)
+    {
+        return (int)Math.Round(FurnaceWidthBase + (FurnaceWidthAtCap - FurnaceWidthBase) *
+            TightenProgress(holdings - 1));
+    }
+
+    public static int FurnaceHeight(int holdings)
+    {
+        return (int)Math.Round(FurnaceHeightBase + (FurnaceHeightAtCap - FurnaceHeightBase) *
+            TightenProgress(holdings - 1));
     }
 
     public static BigInteger TierExpansionCost(int tier, int expansions, double growth, double baseFactor)

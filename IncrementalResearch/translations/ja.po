@@ -612,3 +612,183 @@ msgstr ""
 "\n"
 "\n"
 "計算機室を十分に拡張したので、次の設備の設計図が完成しました。真空実験室(設備メニューの研究タブ)を建てられるようになります。周囲が真空である必要がありますが、真空では熱が逃げにくいので、温度に注意してください(拡張するほど発熱が増えます)。稼働している間、計算機室の性能を積み上げます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.REQUIRE_POWER"
+msgid "Draws {0} kW while running (grows as it is expanded, up to a limit)"
+msgstr "稼働中に{0}kWを消費する(拡張するほど増え、上限あり)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.REQUIRE_BAND"
+msgid "Needs a clear band {0} cells long, left and right of the facility, as tall as the facility. Blocked cells now: {1}"
+msgstr "設備の左右に、設備と同じ高さで合計{0}セルの帯状の範囲を空ける必要がある。現在の妨げのセル数: {1}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.REQUIRE_RECT"
+msgid "Needs a clear area {0} wide and {1} tall, from the base of the facility upward. Blocked cells now: {2}"
+msgstr "設備の底面から上へ、幅{0}、高さ{1}の範囲を空ける必要がある。現在の妨げのセル数: {2}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.BLOCKED_NAME"
+msgid "Space is blocked"
+msgstr "スペースが塞がれている"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.BLOCKED_TOOLTIP"
+msgid "Natural solid or built tiles are in the area this facility needs. Its activity is falling."
+msgstr "この設備に必要な範囲に、自然の固体タイルか建設したタイルがある。稼働率が下がっている。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.UNIT_4"
+msgid "Beam Lines"
+msgstr "ビームライン"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_ACCELERATOR.NAME"
+msgid "High-Energy Particle Accelerator"
+msgstr "高エネルギー粒子加速器"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_ACCELERATOR.DESC"
+msgid "A ring that smashes the colony's records together at absurd energies."
+msgstr "コロニーの記録を、とんでもないエネルギーでぶつけ合わせる環状の装置。"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_ACCELERATOR.EFFECT"
+msgid "Builds up the performance of the Vacuum Lab while running. Draws more electric power the more it is expanded, up to a limit.\n\nIts activity falls while stopped, but the built-up performance is kept."
+msgstr "稼働している間、真空実験室の性能を積み上げる。拡張するほど消費電力が増える(上限あり)。\n\n停止中は稼働率が下がるが、積み上げた性能は失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T4_FOCUS.NAME"
+msgid "Beam Focusing"
+msgstr "ビーム集束"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T4_FOCUS.DESC"
+msgid "Accelerator build-up speed x2."
+msgstr "高エネルギー粒子加速器の積み上げ速度が2倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T4_AUTO_EXPAND.NAME"
+msgid "Automated Collisions"
+msgstr "自動衝突"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T4_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Accelerator whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときに高エネルギー粒子加速器を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE9_TITLE"
+msgid "Blueprint: High-Energy Particle Accelerator"
+msgstr "設計図: 高エネルギー粒子加速器"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE9_BODY"
+msgid "The Vacuum Lab has been expanded far enough to draw up the next facility. The High-Energy Particle Accelerator (Equipment menu, Research tab) is now available. Build it from steel and plastic and keep it powered: it draws more power the more you expand it (up to 10 kW). While it runs, it builds up the performance of the Vacuum Lab."
+msgstr "真空実験室を十分に拡張したので、次の設備の設計図が完成しました。高エネルギー粒子加速器(設備メニューの研究タブ)を建てられるようになります。鋼鉄とプラスチックで建設し、電力を供給してください(拡張するほど消費電力が増え、上限は10kWです)。稼働している間、真空実験室の性能を積み上げます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.UNIT_5"
+msgid "Confinement Cells"
+msgstr "閉じ込めセル"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_CONFINEMENT.NAME"
+msgid "Excited Quantum Confinement Structure"
+msgstr "励起量子閉じ込め構造体"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_CONFINEMENT.DESC"
+msgid "A lattice that holds excited states still long enough to read them."
+msgstr "励起状態を読み取れるだけの間、じっと閉じ込めておく格子。"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_CONFINEMENT.EFFECT"
+msgid "Builds up the performance of the Accelerator while running. Draws more electric power the more it is expanded, up to a limit.\n\nIts activity falls while stopped, but the built-up performance is kept."
+msgstr "稼働している間、高エネルギー粒子加速器の性能を積み上げる。拡張するほど消費電力が増える(上限あり)。\n\n停止中は稼働率が下がるが、積み上げた性能は失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T5_RESONANCE.NAME"
+msgid "Stable Resonance"
+msgstr "共鳴の安定化"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T5_RESONANCE.DESC"
+msgid "Confinement Structure build-up speed x2."
+msgstr "励起量子閉じ込め構造体の積み上げ速度が2倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T5_AUTO_EXPAND.NAME"
+msgid "Automated Confinement"
+msgstr "自動閉じ込め"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T5_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Confinement Structure whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときに励起量子閉じ込め構造体を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE10_TITLE"
+msgid "Blueprint: Excited Quantum Confinement Structure"
+msgstr "設計図: 励起量子閉じ込め構造体"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE10_BODY"
+msgid "The Accelerator has been expanded far enough to draw up the next facility. The Excited Quantum Confinement Structure (Equipment menu, Research tab) is now available. Build it from refined metal and glass and keep it powered: it draws more power the more you expand it (up to 24 kW). While it runs, it builds up the performance of the Accelerator."
+msgstr "高エネルギー粒子加速器を十分に拡張したので、次の設備の設計図が完成しました。励起量子閉じ込め構造体(設備メニューの研究タブ)を建てられるようになります。精錬金属とガラスで建設し、電力を供給してください(拡張するほど消費電力が増え、上限は24kWです)。稼働している間、高エネルギー粒子加速器の性能を積み上げます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.UNIT_6"
+msgid "Observation Nodes"
+msgstr "観測ノード"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_OBSERVATIONNET.NAME"
+msgid "Coherence Observation Net"
+msgstr "コヒーレンス観測ネット"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_OBSERVATIONNET.DESC"
+msgid "A net of sensors strung out sideways, watching for coherence."
+msgstr "横に張り渡したセンサーの網で、コヒーレンスを見張る。"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_OBSERVATIONNET.EFFECT"
+msgid "Builds up the performance of the Confinement Structure while running. Needs a clear band of cells to its left and right, as tall as the facility, that grows the more it is expanded, up to a limit. Natural solid and built tiles block it; gas, liquid, wires, pipes and ladders do not.\n\nIts activity falls while stopped, but the built-up performance is kept."
+msgstr "稼働している間、励起量子閉じ込め構造体の性能を積み上げる。設備と同じ高さの帯状の範囲を、左右に空けておく必要がある。範囲は拡張するほど広がる(上限あり)。自然の固体タイルと建設したタイルは妨げになるが、気体・液体・電線・配管・はしごは妨げにならない。\n\n停止中は稼働率が下がるが、積み上げた性能は失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T6_APERTURE.NAME"
+msgid "Wider Aperture"
+msgstr "観測口径の拡大"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T6_APERTURE.DESC"
+msgid "Observation Net build-up speed x2."
+msgstr "コヒーレンス観測ネットの積み上げ速度が2倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T6_AUTO_EXPAND.NAME"
+msgid "Automated Observation"
+msgstr "自動観測"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T6_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Observation Net whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときにコヒーレンス観測ネットを自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE11_TITLE"
+msgid "Blueprint: Coherence Observation Net"
+msgstr "設計図: コヒーレンス観測ネット"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE11_BODY"
+msgid "The Confinement Structure has been expanded far enough to draw up the next facility. The Coherence Observation Net (Equipment menu, Research tab) is now available. Build it from refined metal and fiber, and keep a band of cells to its left and right clear of tiles (up to 40 cells in total, as tall as the facility; it widens as you expand it). While it runs, it builds up the performance of the Confinement Structure."
+msgstr "励起量子閉じ込め構造体を十分に拡張したので、次の設備の設計図が完成しました。コヒーレンス観測ネット(設備メニューの研究タブ)を建てられるようになります。精錬金属と繊維で建設し、左右に設備と同じ高さの帯状の範囲をタイルのない状態で空けてください(拡張するほど広がり、合計で最大40セルです)。稼働している間、励起量子閉じ込め構造体の性能を積み上げます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.UNIT_7"
+msgid "Extraction Channels"
+msgstr "抽出チャネル"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_EXTRACTIONFURNACE.NAME"
+msgid "Insight Degeneracy Extraction Furnace"
+msgstr "知見縮退抽出炉"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_EXTRACTIONFURNACE.DESC"
+msgid "A furnace that squeezes the last drop of Insight out of a degenerate state of knowledge."
+msgstr "縮退した知見の状態から、最後の一滴まで知見を絞り出す炉。"
+
+msgctxt "IncrementalResearch.STRINGS.BUILDINGS.PREFABS.IR_EXTRACTIONFURNACE.EFFECT"
+msgid "Builds up the performance of the Observation Net while running. Needs a clear rectangle from its base upward, centered on it, that grows the more it is expanded, up to a limit. Natural solid and built tiles block it; gas, liquid, wires, pipes and ladders do not.\n\nIts activity falls while stopped, but the built-up performance is kept."
+msgstr "稼働している間、コヒーレンス観測ネットの性能を積み上げる。設備の底面から上へ、設備を中心にした長方形の範囲を空けておく必要がある。範囲は拡張するほど広がる(上限あり)。自然の固体タイルと建設したタイルは妨げになるが、気体・液体・電線・配管・はしごは妨げにならない。\n\n停止中は稼働率が下がるが、積み上げた性能は失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T7_CHANNEL.NAME"
+msgid "Deeper Degeneracy"
+msgstr "縮退の深化"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T7_CHANNEL.DESC"
+msgid "Extraction Furnace build-up speed x2."
+msgstr "知見縮退抽出炉の積み上げ速度が2倍になる。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T7_AUTO_EXPAND.NAME"
+msgid "Automated Extraction"
+msgstr "自動抽出"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.T7_AUTO_EXPAND.DESC"
+msgid "Automatically expands the Extraction Furnace whenever affordable. Kept through paradigm shifts."
+msgstr "買えるときに知見縮退抽出炉を自動で拡張する。パラダイムシフトでも失われない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE12_TITLE"
+msgid "Blueprint: Insight Degeneracy Extraction Furnace"
+msgstr "設計図: 知見縮退抽出炉"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE12_BODY"
+msgid "The Observation Net has been expanded far enough to draw up the final facility. The Insight Degeneracy Extraction Furnace (Equipment menu, Research tab) is now available. Build it from steel, glass, ceramic and plastic, and keep a rectangle of cells above its base clear of tiles (up to 32 wide and 16 tall; it grows as you expand it). While it runs, it builds up the performance of the Observation Net."
+msgstr "コヒーレンス観測ネットを十分に拡張したので、最後の設備の設計図が完成しました。知見縮退抽出炉(設備メニューの研究タブ)を建てられるようになります。鋼鉄、ガラス、セラミック、プラスチックで建設し、底面から上に長方形の範囲をタイルのない状態で空けてください(拡張するほど広がり、最大で幅32、高さ16です)。稼働している間、コヒーレンス観測ネットの性能を積み上げます。"

@@ -44,8 +44,31 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private double activityTier3;
     [Serialize] private bool tier2Unlocked;
     [Serialize] private bool tier3Unlocked;
+    // Tiers 4 to 7 (see docs/spec-tiers-4-7.md).
+    [Serialize] private int scaleTier4;
+    [Serialize] private int scaleTier5;
+    [Serialize] private int scaleTier6;
+    [Serialize] private int scaleTier7;
+    [Serialize] private double bonusTier3;
+    [Serialize] private double bonusTier4;
+    [Serialize] private double bonusTier5;
+    [Serialize] private double bonusTier6;
+    [Serialize] private double activityTier4;
+    [Serialize] private double activityTier5;
+    [Serialize] private double activityTier6;
+    [Serialize] private double activityTier7;
+    [Serialize] private bool tier4Unlocked;
+    [Serialize] private bool tier5Unlocked;
+    [Serialize] private bool tier6Unlocked;
+    [Serialize] private bool tier7Unlocked;
     // Bit i is set once tutorial dialog i has been shown. tutorialStage is the old counter, kept for old saves.
     [Serialize] private int tutorialFlags;
+
+    // Per tier values, indexed by tier (index 0 unused). Copied to and from the serialized fields above.
+    private readonly int[] scales = new int[KnowledgeRules.MaxTier + 1];
+    private readonly double[] bonuses = new double[KnowledgeRules.MaxTier + 1];
+    private readonly double[] activities = new double[KnowledgeRules.MaxTier + 1];
+    private readonly bool[] unlocked = new bool[KnowledgeRules.MaxTier + 1];
 
     private BigInteger knowledge = BigInteger.Zero;
     // Insight produced in the current cycle, in thousandths. Decides the Meta-Insight gained by a shift.
@@ -64,9 +87,9 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     private const int MaxAutoPurchasesPerTick = KnowledgeRules.MaxExpansionsPerAction;
 
     public BigInteger KnowledgeScaled => knowledge;
-    public int ScaleTier1 => scaleTier1;
+    public int ScaleTier1 => scales[1];
     // The facility itself counts as the first unit; expansions add to it.
-    public int HoldingsTier1 => scaleTier1 + 1;
+    public int HoldingsTier1 => scales[1] + 1;
     public double BaseRate => baseRate;
     public double MultiplierTier1 => TierMultiplier(1);
 
@@ -78,12 +101,12 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
     public bool IsTierUnlocked(int tier)
     {
-        return tier == 1 || (tier == 2 ? tier2Unlocked : tier3Unlocked);
+        return tier == 1 || (tier > 1 && tier <= KnowledgeRules.MaxTier && unlocked[tier]);
     }
 
     public int GetScale(int tier)
     {
-        return tier == 1 ? scaleTier1 : tier == 2 ? scaleTier2 : scaleTier3;
+        return scales[tier];
     }
 
     public int Holdings(int tier)
@@ -93,13 +116,13 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
     public double Bonus(int tier)
     {
-        return tier == 1 ? bonusTier1 : bonusTier2;
+        return bonuses[tier];
     }
 
     // Activity of the facility of a tier (tier 2 and 3).
     public double Activity(int tier)
     {
-        return tier == 2 ? activityTier2 : activityTier3;
+        return activities[tier];
     }
 
     // Performance of a tier given by the facility above it: 1 plus the built-up bonus scaled by that activity.
@@ -177,7 +200,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public bool IdleMode => idleMode;
 
     // The Insight tab is shown once the research tree is complete or the idle game has been touched.
-    public bool Unlocked => researchComplete || knowledge > 0 || scaleTier1 > 0 || shiftCount > 0 ||
+    public bool Unlocked => researchComplete || knowledge > 0 || scales[1] > 0 || shiftCount > 0 ||
                             RecordArchive.AnyExists;
 
     protected override void OnPrefabInit()
@@ -199,6 +222,31 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [OnSerializing]
     private void OnSerializing()
     {
+        scaleTier1 = scales[1];
+        scaleTier2 = scales[2];
+        scaleTier3 = scales[3];
+        scaleTier4 = scales[4];
+        scaleTier5 = scales[5];
+        scaleTier6 = scales[6];
+        scaleTier7 = scales[7];
+        bonusTier1 = bonuses[1];
+        bonusTier2 = bonuses[2];
+        bonusTier3 = bonuses[3];
+        bonusTier4 = bonuses[4];
+        bonusTier5 = bonuses[5];
+        bonusTier6 = bonuses[6];
+        activityTier2 = activities[2];
+        activityTier3 = activities[3];
+        activityTier4 = activities[4];
+        activityTier5 = activities[5];
+        activityTier6 = activities[6];
+        activityTier7 = activities[7];
+        tier2Unlocked = unlocked[2];
+        tier3Unlocked = unlocked[3];
+        tier4Unlocked = unlocked[4];
+        tier5Unlocked = unlocked[5];
+        tier6Unlocked = unlocked[6];
+        tier7Unlocked = unlocked[7];
         knowledgeText = knowledge.ToString();
         upgradesText = string.Join(",", upgrades);
         automationOffText = string.Join(",", automationOff);
@@ -210,6 +258,32 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [OnDeserialized]
     private void OnDeserialized()
     {
+        scales[1] = scaleTier1;
+        scales[2] = scaleTier2;
+        scales[3] = scaleTier3;
+        scales[4] = scaleTier4;
+        scales[5] = scaleTier5;
+        scales[6] = scaleTier6;
+        scales[7] = scaleTier7;
+        bonuses[1] = bonusTier1;
+        bonuses[2] = bonusTier2;
+        bonuses[3] = bonusTier3;
+        bonuses[4] = bonusTier4;
+        bonuses[5] = bonusTier5;
+        bonuses[6] = bonusTier6;
+        activities[2] = activityTier2;
+        activities[3] = activityTier3;
+        activities[4] = activityTier4;
+        activities[5] = activityTier5;
+        activities[6] = activityTier6;
+        activities[7] = activityTier7;
+        unlocked[2] = tier2Unlocked;
+        unlocked[3] = tier3Unlocked;
+        unlocked[4] = tier4Unlocked;
+        unlocked[5] = tier5Unlocked;
+        unlocked[6] = tier6Unlocked;
+        unlocked[7] = tier7Unlocked;
+
         if (!BigInteger.TryParse(knowledgeText, out knowledge))
         {
             knowledge = BigInteger.Zero;
@@ -249,7 +323,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         }
 
         // Saves from before the tutorial existed have already played through it.
-        if (tutorialFlags == 0 && (scaleTier1 > 0 || knowledge > 0))
+        if (tutorialFlags == 0 && (scales[1] > 0 || knowledge > 0))
         {
             tutorialFlags = (1 << TutorialDialog.StageCount) - 1;
         }
@@ -411,11 +485,12 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         shiftCount++;
         schoolId = SchoolsUnlocked && Schools.Find(newSchoolId) != null ? newSchoolId : "";
 
-        scaleTier1 = 0;
-        scaleTier2 = 0;
-        scaleTier3 = 0;
-        bonusTier1 = 0d;
-        bonusTier2 = 0d;
+        for (var tier = 1; tier <= KnowledgeRules.MaxTier; tier++)
+        {
+            scales[tier] = 0;
+            bonuses[tier] = 0d;
+        }
+
         produced = BigInteger.Zero;
         knowledgeRemainder = 0d;
         var startingKnowledge = 0d;
@@ -474,12 +549,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         }
 
         Spend(cost);
-        switch (tier)
-        {
-            case 1: scaleTier1++; break;
-            case 2: scaleTier2++; break;
-            default: scaleTier3++; break;
-        }
+        scales[tier]++;
 
         return true;
     }
@@ -619,39 +689,32 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             RefreshBuildMenu();
         }
 
-        if (!tier2Unlocked && scaleTier1 >= KnowledgeRules.Tier2UnlockExpansions)
+        for (var tier = 2; tier <= KnowledgeRules.MaxTier; tier++)
         {
-            tier2Unlocked = true;
-            RefreshBuildMenu();
-        }
+            if (!unlocked[tier] && scales[tier - 1] >= KnowledgeRules.UnlockExpansions(tier))
+            {
+                unlocked[tier] = true;
+                RefreshBuildMenu();
+            }
 
-        if (!tier3Unlocked && scaleTier2 >= KnowledgeRules.Tier3UnlockExpansions)
-        {
-            tier3Unlocked = true;
-            RefreshBuildMenu();
+            activities[tier] = ApproachActivity(activities[tier], TierFacility.AnyOperational(tier), dt);
         }
-
-        activityTier2 = ApproachActivity(activityTier2, TierFacility.AnyOperational(2), dt);
-        activityTier3 = ApproachActivity(activityTier3, TierFacility.AnyOperational(3), dt);
 
         // The built-up performance only grows while the facility runs, and the lower the activity, the slower.
-        bonusTier1 += dt * BonusRate(2);
-        bonusTier2 += dt * BonusRate(3);
+        for (var tier = 2; tier <= KnowledgeRules.MaxTier; tier++)
+        {
+            bonuses[tier - 1] += dt * BonusRate(tier);
+        }
     }
 
-    // Performance per second that the facility of a tier (2 or 3) builds up for the tier below, as things stand.
+    // Performance per second that the facility of a tier (2 and up) builds up for the tier below, as things stand.
     public double BonusRate(int tier)
     {
         // The Meta-Insight multiplier is deliberately left out: it already multiplies the production of the
         // tier below, and counting it here as well would make it compound with itself and run away.
-        if (tier == 2)
-        {
-            return KnowledgeRules.BonusRateTier2 * EffectiveBaseRate * Holdings(2) * BuildUpMultiplier(2) *
-                   Performance(2) * activityTier2;
-        }
-
-        return KnowledgeRules.BonusRateTier3 * EffectiveBaseRate * Holdings(3) * BuildUpMultiplier(3) *
-               activityTier3;
+        // A tier that has a tier above it is itself raised by that tier's performance.
+        return KnowledgeRules.BonusRate(tier) * EffectiveBaseRate * Holdings(tier) * BuildUpMultiplier(tier) *
+               Performance(tier) * activities[tier];
     }
 
     private double BuildUpMultiplier(int tier)
@@ -684,8 +747,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             case 3: return AffordableUpgradeCount() > 0;
             case 4: return CanShift;
             case 5: return SchoolsUnlocked;
-            case 6: return tier2Unlocked;
-            default: return tier3Unlocked;
+            default: return unlocked[stage - 4];
         }
     }
 

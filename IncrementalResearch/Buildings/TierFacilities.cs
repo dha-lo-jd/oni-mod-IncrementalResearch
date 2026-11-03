@@ -1,3 +1,4 @@
+using System;
 using IncrementalResearch.Core;
 using UnityEngine;
 
@@ -61,4 +62,157 @@ public sealed class VacuumLab : TierFacility
 
         return null;
     }
+}
+
+// Tier 4 facility. Draws more electric power the more it is expanded.
+public sealed class ParticleAccelerator : TierFacility
+{
+    public override int Tier => 4;
+
+    protected override float PowerKilowatts =>
+        KnowledgeRules.AcceleratorPower(KnowledgeState.Instance?.Holdings(4) ?? 1);
+
+    protected override string EnvironmentRequirement =>
+        string.Format(STRINGS.UI.TIERS.REQUIRE_POWER, NumberFormat.Format(PowerKilowatts));
+
+    protected override StatusItem FindProblem()
+    {
+        return null;
+    }
+}
+
+// Tier 5 facility. Draws more electric power the more it is expanded.
+public sealed class ConfinementStructure : TierFacility
+{
+    public override int Tier => 5;
+
+    protected override float PowerKilowatts =>
+        KnowledgeRules.ConfinementPower(KnowledgeState.Instance?.Holdings(5) ?? 1);
+
+    protected override string EnvironmentRequirement =>
+        string.Format(STRINGS.UI.TIERS.REQUIRE_POWER, NumberFormat.Format(PowerKilowatts));
+
+    protected override StatusItem FindProblem()
+    {
+        return null;
+    }
+}
+
+// Base of the tier 6 and 7 facilities: they need an area around them to be free of solid tiles.
+// A cell is free when it holds no natural solid and no built tile; gas, liquid, wires, pipes and ladders are fine,
+// and so is any building without a solid foundation. Cells outside the world count as blocked.
+public abstract class ClearanceFacility : TierFacility
+{
+    private static StatusItem blockedProblem;
+
+    [MyCmpGet] private Building building;
+    private int ticksUntilScan;
+    private int blockedCells;
+
+    // Cells to keep free, given the holdings and the columns [xMin, xMax] and bottom row the facility occupies.
+    protected abstract void GetArea(int holdings, int xMin, int xMax, int facilityHeight,
+        out int left, out int right, out int height);
+
+    protected int BlockedCells => blockedCells;
+
+    protected override StatusItem FindProblem()
+    {
+        // The scan can cover hundreds of cells, so it runs once a second rather than on every tick.
+        if (ticksUntilScan-- <= 0)
+        {
+            ticksUntilScan = 4;
+            Scan();
+        }
+
+        if (blockedCells == 0)
+        {
+            return null;
+        }
+
+        return blockedProblem ??= CreateProblem("IR_AreaBlocked", STRINGS.UI.TIERS.BLOCKED_NAME,
+            STRINGS.UI.TIERS.BLOCKED_TOOLTIP);
+    }
+
+    private void Scan()
+    {
+        var xMin = int.MaxValue;
+        var xMax = int.MinValue;
+        var yBottom = int.MaxValue;
+        var yTop = int.MinValue;
+        foreach (var cell in building.PlacementCells)
+        {
+            Grid.CellToXY(cell, out var x, out var y);
+            xMin = Math.Min(xMin, x);
+            xMax = Math.Max(xMax, x);
+            yBottom = Math.Min(yBottom, y);
+            yTop = Math.Max(yTop, y);
+        }
+
+        var holdings = KnowledgeState.Instance?.Holdings(Tier) ?? 1;
+        GetArea(holdings, xMin, xMax, yTop - yBottom + 1, out var left, out var right, out var height);
+
+        var worldId = this.GetMyWorldId();
+        var blocked = 0;
+        for (var y = yBottom; y < yBottom + height; y++)
+        {
+            for (var x = xMin - left; x <= xMax + right; x++)
+            {
+                if (x >= xMin && x <= xMax && y <= yTop)
+                {
+                    continue;
+                }
+
+                if (x < 0 || y < 0 || x >= Grid.WidthInCells || y >= Grid.HeightInCells)
+                {
+                    blocked++;
+                    continue;
+                }
+
+                var cell = Grid.XYToCell(x, y);
+                if (!Grid.IsValidCellInWorld(cell, worldId) || Grid.Solid[cell] || Grid.Foundation[cell])
+                {
+                    blocked++;
+                }
+            }
+        }
+
+        blockedCells = blocked;
+    }
+}
+
+// Tier 6 facility: a clear band to its left and right, as tall as the facility.
+public sealed class ObservationNet : ClearanceFacility
+{
+    public override int Tier => 6;
+
+    protected override void GetArea(int holdings, int xMin, int xMax, int facilityHeight,
+        out int left, out int right, out int height)
+    {
+        var length = KnowledgeRules.NetBandLength(holdings);
+        left = length / 2;
+        right = length - left;
+        height = facilityHeight;
+    }
+
+    protected override string EnvironmentRequirement => string.Format(STRINGS.UI.TIERS.REQUIRE_BAND,
+        KnowledgeRules.NetBandLength(KnowledgeState.Instance?.Holdings(6) ?? 1), BlockedCells);
+}
+
+// Tier 7 facility: a clear rectangle from its base upward, centered on it.
+public sealed class ExtractionFurnace : ClearanceFacility
+{
+    public override int Tier => 7;
+
+    protected override void GetArea(int holdings, int xMin, int xMax, int facilityHeight,
+        out int left, out int right, out int height)
+    {
+        var extra = Math.Max(0, KnowledgeRules.FurnaceWidth(holdings) - (xMax - xMin + 1));
+        left = extra / 2;
+        right = extra - left;
+        height = KnowledgeRules.FurnaceHeight(holdings);
+    }
+
+    protected override string EnvironmentRequirement => string.Format(STRINGS.UI.TIERS.REQUIRE_RECT,
+        KnowledgeRules.FurnaceWidth(KnowledgeState.Instance?.Holdings(7) ?? 1),
+        KnowledgeRules.FurnaceHeight(KnowledgeState.Instance?.Holdings(7) ?? 1), BlockedCells);
 }

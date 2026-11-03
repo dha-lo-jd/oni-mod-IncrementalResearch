@@ -7,6 +7,7 @@ constants. See docs/balance.md.
 Run:  python tools/balance_sim.py [base_rate] [hours]
 """
 import math
+import os
 import sys
 
 
@@ -48,15 +49,26 @@ U = [
  ("T3_ISOLATION",3,5e9,"mul",2,5,None,"I",0,False),
  ("T3_CHAMBER",3,5e10,"grow",1.20,10,None,"I",0,False),
  ("T1_AUTO_EXPAND",1,2000,"autoexp",0,12,None,"I",0,True),
+ ("T4_FOCUS",4,5e16,"mul",2,5,None,"I",0,False),
+ ("T5_RESONANCE",5,5e19,"mul",2,5,None,"I",0,False),
+ ("T6_APERTURE",6,5e22,"mul",2,5,None,"I",0,False),
+ ("T7_CHANNEL",7,5e25,"mul",2,5,None,"I",0,False),
+ ("T4_AUTO_EXPAND",4,3e17,"autoexp",0,12,None,"I",0,True),
+ ("T5_AUTO_EXPAND",5,3e20,"autoexp",0,12,None,"I",0,True),
+ ("T6_AUTO_EXPAND",6,3e23,"autoexp",0,12,None,"I",0,True),
+ ("T7_AUTO_EXPAND",7,3e26,"autoexp",0,12,None,"I",0,True),
  ("M_HEADSTART",0,3,"start",100,0,None,"M",1,True),
  ("M_DISCOUNT",1,8,"disc",0.5,0,None,"M",2,True),
 ]
 # Tiers 4-7 are draft values (docs/spec-tiers-4-7.md); NT = number of tiers simulated.
 NT = 3
-BASE = {1:10.0, 2:1000.0, 3:1e6, 4:1e9, 5:1e12, 6:1e15, 7:1e18}
+SAVE_FACTOR = float(__import__('os').environ.get('SAVE','0'))   # 0 = pure greedy
+BASE = {1:10.0, 2:1000.0, 3:1e6, 4:1e11, 5:3e12, 6:1e14, 7:3e15}
 GROW = {1:1.15, 2:1.18, 3:1.22, 4:1.25, 5:1.28, 6:1.31, 7:1.34}
-UNLOCK = {2:25, 3:15, 4:15, 5:15, 6:15, 7:15}   # expansions of the tier below
+UNLOCK = {2:25, 3:15, 4:30, 5:30, 6:30, 7:30}   # expansions of the tier below
 BONUS = {2:0.002, 3:0.001, 4:0.0005, 5:0.00025, 6:0.0001, 7:0.00005}   # build-up rate of tier t on tier t-1
+
+EVENTS = []   # (hours, name) of upgrade purchases, tier unlocks and shifts, for the event spacing report
 
 def run(P, hours=100, dt=2.0, verbose=True, label=""):
     gain = P.gain or default_gain
@@ -124,18 +136,25 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
                 if not unl[tier]: continue
                 c = cost(tier)
                 if c<=know: opts.append((c,"e",tier))
+            # A player saves up for a visible upgrade that is not far out of reach instead of buying expansions forever.
+            saving = [u for u in U if u[7]=="I" and vis(u) and u[2]>know and u[2] <= SAVE_FACTOR*min([cost(tr) for tr in range(1,NT+1) if unl[tr]])]
+            if saving:
+                opts = [o for o in opts if o[1]=="u"]
             if not opts: break
             opts.sort(key=lambda o:o[0])
             c,k,x = opts[0]
             know -= c
-            if k=="u": ups.add(x[0])
+            if k=="u": ups.add(x[0]); EVENTS.append((t/3600,'U:'+x[0]+('' if shifts==0 else '@s%d'%shifts)))
             else: ex[x]+=1
             for tt in range(2,NT+1):
-                if not unl[tt] and ex[tt-1]>=UNLOCK[tt]: unl[tt]=True
+                if not unl[tt] and ex[tt-1]>=UNLOCK[tt]: unl[tt]=True; EVENTS.append((t/3600,'TIER%d'%tt))
+        if os.environ.get('TL') and shifts==0 and int(t)%300==0 and t>0 and int(t)!=getattr(P,'_lt',-1):
+            P._lt=int(t); print('t=%5.1fmin T=%.2g know=%.2g P=%.2g ex=%s'%(t/60,T,know,prod,[ex[i] for i in range(1,NT+1)]))
         # shift decision
         g = gain(P, T)
         cyc = t-cycle_start
         if g>=1 and g >= max(1, P.rho*max(Mearned, getattr(P,'mmin',0))):
+            EVENTS.append((t/3600,'SHIFT%d'%(shifts+1)))
             rows.append((t/3600, cyc/60, shifts, Mearned, g, peakP, mi))
             Mearned += g; shifts += 1
             # MI purchases
@@ -194,8 +213,18 @@ def slopes(rows):
 
 import os
 for _t in range(4,8):
-    BONUS[_t] *= float(os.environ.get('BONUS_SCALE','0.02'))
-    BASE[_t] *= float(os.environ.get('BASE_SCALE','1e6'))
+    BONUS[_t] *= float(os.environ.get('BONUS_SCALE','0.01'))
+    BASE[_t] *= float(os.environ.get('BASE_SCALE','1'))
+
+# Overrides for tuning the schedule of tiers 4-7:  BASES="b4,b5,b6,b7"  UNL="u4,u5,u6,u7"  MULC=100  AUTOC=1000
+if os.environ.get('BASES'):
+    for _t,_v in zip(range(4,8),os.environ['BASES'].split(',')): BASE[_t]=float(_v)
+if os.environ.get('UNL'):
+    for _t,_v in zip(range(4,8),os.environ['UNL'].split(',')): UNLOCK[_t]=int(_v)
+_MULC=float(os.environ.get('MULC','100')); _AUTOC=float(os.environ.get('AUTOC','1000'))
+_REQ=int(os.environ.get('REQMUL','5')); _REQA=int(os.environ.get('REQAUTO','12'))
+U[:] = [(u[0],u[1],(BASE[u[1]]*(_MULC if u[0].endswith(('FOCUS','RESONANCE','APERTURE','CHANNEL')) else _AUTOC) if u[1]>=4 and u[7]=='I' else u[2]),u[3],u[4],
+         ((_REQ if u[3]=='mul' else _REQA) if u[1]>=4 else u[5]),u[6],u[7],u[8],u[9]) for u in U]
 
 if __name__=="__main__":
     S=float(sys.argv[1]) if len(sys.argv)>1 else 8.0
@@ -203,6 +232,20 @@ if __name__=="__main__":
     NT=int(sys.argv[3]) if len(sys.argv)>3 else 3
     # The shipped constants (KnowledgeRules.cs): T0, k, p0, cg, cm.
     P=make3(1e14,0.01,0.98,1e-4,5e-5,S=S,rho=4.0)
-    rows,inf,t=run(P,hours=H,dt=15.0,verbose=False)
+    rows,inf,t=run(P,hours=H,dt=float(os.environ.get("DT","15")),verbose=False)
     print("base rate %g: first shift at %.2f h, %d shifts, log10(P) at end %.0f%s"%(S,rows[0][0] if rows else -1,len(rows),math.log10(max(rows[-1][5],1)) if rows else 0," (INF)" if inf else ""))
     print(slopes(rows))
+    if os.environ.get('EVENTS'):
+        prev=0
+        for h,n in EVENTS[:int(os.environ.get('EVENTS'))]:
+            print('%7.3fh  +%6.1fmin  %s'%(h,(h-prev)*60,n)); prev=h
+    if os.environ.get('FIRST'):
+        seen={}
+        for h,n in EVENTS:
+            k=n.split('@')[0]
+            if k.startswith('U:') and '@' in n: continue
+            seen.setdefault(k,h)
+        prev=0; mx=0
+        for k,h in sorted(seen.items(),key=lambda kv:kv[1]):
+            print('%7.3fh  +%6.1fmin  %s'%(h,(h-prev)*60,k)); mx=max(mx,h-prev); prev=h
+        print('max gap %.1f min'%(mx*60))

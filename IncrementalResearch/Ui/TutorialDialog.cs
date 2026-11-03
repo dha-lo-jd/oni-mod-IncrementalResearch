@@ -5,7 +5,7 @@ namespace IncrementalResearch.Ui;
 // The short guided introduction: one dialog per stage, shown as the player reaches each milestone.
 internal static class TutorialDialog
 {
-    public const int StageCount = 8;
+    public const int StageCount = 12;
 
     public static void Show(int stage, System.Action onClosed)
     {
@@ -41,9 +41,25 @@ internal static class TutorialDialog
                 header = STRINGS.UI.TUTORIAL.STAGE7_TITLE;
                 body = STRINGS.UI.TUTORIAL.STAGE7_BODY;
                 break;
-            default:
+            case 7:
                 header = STRINGS.UI.TUTORIAL.STAGE8_TITLE;
                 body = STRINGS.UI.TUTORIAL.STAGE8_BODY;
+                break;
+            case 8:
+                header = STRINGS.UI.TUTORIAL.STAGE9_TITLE;
+                body = STRINGS.UI.TUTORIAL.STAGE9_BODY;
+                break;
+            case 9:
+                header = STRINGS.UI.TUTORIAL.STAGE10_TITLE;
+                body = STRINGS.UI.TUTORIAL.STAGE10_BODY;
+                break;
+            case 10:
+                header = STRINGS.UI.TUTORIAL.STAGE11_TITLE;
+                body = STRINGS.UI.TUTORIAL.STAGE11_BODY;
+                break;
+            default:
+                header = STRINGS.UI.TUTORIAL.STAGE12_TITLE;
+                body = STRINGS.UI.TUTORIAL.STAGE12_BODY;
                 break;
         }
 
@@ -51,6 +67,6 @@ internal static class TutorialDialog
             ScreenPrefabs.Instance.InfoDialogScreen.gameObject,
             GameScreenManager.Instance.ssOverlayCanvas.gameObject);
         dialog.onDeactivateFn = onClosed;
-        dialog.SetHeader(header).AddPlainText(body).AddDefaultOK();
+        dialog.SetHeader(RubyText.Convert(header)).AddPlainText(RubyText.Convert(body)).AddDefaultOK();
     }
 }

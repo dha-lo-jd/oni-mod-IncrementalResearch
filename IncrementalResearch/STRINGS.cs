@@ -73,6 +73,18 @@ public static class STRINGS
                 "<i>Is there something \"in\" a vacuum? Whatever the philosophers say, the hole of a giant donut is perfect for all manner of research. It would be far more unnatural to dislike such a convenient thing. At any rate, a room packed with vacuum like sardines should fill our tin cans with Insight as well.\n\n\n" +
                 "\"Make the air clean. Yes, take it out.\"  - Albert L. Davoski</i>\n\n" +
                 "The Compute Room has been expanded far enough to draw up the next facility. The Vacuum Lab (Equipment menu, Research tab) is now available. It needs a vacuum around it, and heat does not escape in a vacuum, so mind its temperature (it gives off more heat the more you expand it). While it runs, it builds up the performance of the Compute Room.";
+            public static LocString STAGE9_TITLE = "Blueprint: High-Energy Particle Accelerator";
+            public static LocString STAGE9_BODY =
+                "The Vacuum Lab has been expanded far enough to draw up the next facility. The High-Energy Particle Accelerator (Equipment menu, Research tab) is now available. Build it from steel and plastic and keep it powered: it draws more power the more you expand it (up to 10 kW). While it runs, it builds up the performance of the Vacuum Lab.";
+            public static LocString STAGE10_TITLE = "Blueprint: Excited Quantum Confinement Structure";
+            public static LocString STAGE10_BODY =
+                "The Accelerator has been expanded far enough to draw up the next facility. The Excited Quantum Confinement Structure (Equipment menu, Research tab) is now available. Build it from refined metal and glass and keep it powered: it draws more power the more you expand it (up to 24 kW). While it runs, it builds up the performance of the Accelerator.";
+            public static LocString STAGE11_TITLE = "Blueprint: Coherence Observation Net";
+            public static LocString STAGE11_BODY =
+                "The Confinement Structure has been expanded far enough to draw up the next facility. The Coherence Observation Net (Equipment menu, Research tab) is now available. Build it from refined metal and fiber, and keep a band of cells to its left and right clear of tiles (up to 40 cells in total, as tall as the facility; it widens as you expand it). While it runs, it builds up the performance of the Confinement Structure.";
+            public static LocString STAGE12_TITLE = "Blueprint: Insight Degeneracy Extraction Furnace";
+            public static LocString STAGE12_BODY =
+                "The Observation Net has been expanded far enough to draw up the final facility. The Insight Degeneracy Extraction Furnace (Equipment menu, Research tab) is now available. Build it from steel, glass, ceramic and plastic, and keep a rectangle of cells above its base clear of tiles (up to 32 wide and 16 tall; it grows as you expand it). While it runs, it builds up the performance of the Observation Net.";
             public static LocString STAGE3_BODY =
                 "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more.";
         }
@@ -154,6 +166,54 @@ public static class STRINGS
             {
                 public static LocString NAME = "Automated Experiments";
                 public static LocString DESC = "Automatically expands the Vacuum Lab whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class T4_FOCUS
+            {
+                public static LocString NAME = "Beam Focusing";
+                public static LocString DESC = "Accelerator build-up speed x2.";
+            }
+
+            public static class T4_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Collisions";
+                public static LocString DESC = "Automatically expands the Accelerator whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class T5_RESONANCE
+            {
+                public static LocString NAME = "Stable Resonance";
+                public static LocString DESC = "Confinement Structure build-up speed x2.";
+            }
+
+            public static class T5_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Confinement";
+                public static LocString DESC = "Automatically expands the Confinement Structure whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class T6_APERTURE
+            {
+                public static LocString NAME = "Wider Aperture";
+                public static LocString DESC = "Observation Net build-up speed x2.";
+            }
+
+            public static class T6_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Observation";
+                public static LocString DESC = "Automatically expands the Observation Net whenever affordable. Kept through paradigm shifts.";
+            }
+
+            public static class T7_CHANNEL
+            {
+                public static LocString NAME = "Deeper Degeneracy";
+                public static LocString DESC = "Extraction Furnace build-up speed x2.";
+            }
+
+            public static class T7_AUTO_EXPAND
+            {
+                public static LocString NAME = "Automated Extraction";
+                public static LocString DESC = "Automatically expands the Extraction Furnace whenever affordable. Kept through paradigm shifts.";
             }
 
             public static class M_AUTO_EXPAND
@@ -245,6 +305,15 @@ public static class STRINGS
         {
             public static LocString UNIT_2 = "Compute Nodes";
             public static LocString UNIT_3 = "Experiment Lines";
+            public static LocString UNIT_4 = "Beam Lines";
+            public static LocString UNIT_5 = "Confinement Cells";
+            public static LocString UNIT_6 = "Observation Nodes";
+            public static LocString UNIT_7 = "Extraction Channels";
+            public static LocString REQUIRE_POWER = "Draws {0} kW while running (grows as it is expanded, up to a limit)";
+            public static LocString REQUIRE_BAND = "Needs a clear band {0} cells long, left and right of the facility, as tall as the facility. Blocked cells now: {1}";
+            public static LocString REQUIRE_RECT = "Needs a clear area {0} wide and {1} tall, from the base of the facility upward. Blocked cells now: {2}";
+            public static LocString BLOCKED_NAME = "Space is blocked";
+            public static LocString BLOCKED_TOOLTIP = "Natural solid or built tiles are in the area this facility needs. Its activity is falling.";
             public static LocString TOO_HOT_NAME = "Too hot to compute";
             public static LocString TOO_HOT_TOOLTIP = "The Compute Room only runs while its cell is cool enough. Its activity is falling.";
             public static LocString NOT_VACUUM_NAME = "Not a vacuum";
@@ -284,6 +353,38 @@ public static class STRINGS
                 public static LocString DESC = "A sealed laboratory where experiments need nothing in the way.";
                 public static LocString EFFECT =
                     "Builds up the performance of the Compute Room while running. Runs only when every cell it occupies is thin enough, and gives off more heat the more it is expanded.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+            }
+
+            public static class IR_ACCELERATOR
+            {
+                public static LocString NAME = "High-Energy Particle Accelerator";
+                public static LocString DESC = "A ring that smashes the colony's records together at absurd energies.";
+                public static LocString EFFECT =
+                    "Builds up the performance of the Vacuum Lab while running. Draws more electric power the more it is expanded, up to a limit.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+            }
+
+            public static class IR_CONFINEMENT
+            {
+                public static LocString NAME = "Excited Quantum Confinement Structure";
+                public static LocString DESC = "A lattice that holds excited states still long enough to read them.";
+                public static LocString EFFECT =
+                    "Builds up the performance of the Accelerator while running. Draws more electric power the more it is expanded, up to a limit.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+            }
+
+            public static class IR_OBSERVATIONNET
+            {
+                public static LocString NAME = "Coherence Observation Net";
+                public static LocString DESC = "A net of sensors strung out sideways, watching for coherence.";
+                public static LocString EFFECT =
+                    "Builds up the performance of the Confinement Structure while running. Needs a clear band of cells to its left and right, as tall as the facility, that grows the more it is expanded, up to a limit. Natural solid and built tiles block it; gas, liquid, wires, pipes and ladders do not.\n\nIts activity falls while stopped, but the built-up performance is kept.";
+            }
+
+            public static class IR_EXTRACTIONFURNACE
+            {
+                public static LocString NAME = "Insight Degeneracy Extraction Furnace";
+                public static LocString DESC = "A furnace that squeezes the last drop of Insight out of a degenerate state of knowledge.";
+                public static LocString EFFECT =
+                    "Builds up the performance of the Observation Net while running. Needs a clear rectangle from its base upward, centered on it, that grows the more it is expanded, up to a limit. Natural solid and built tiles block it; gas, liquid, wires, pipes and ladders do not.\n\nIts activity falls while stopped, but the built-up performance is kept.";
             }
 
             public static class IR_RECORDARCHIVE

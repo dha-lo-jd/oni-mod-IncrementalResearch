@@ -30,6 +30,10 @@ public static class GeneratedBuildings_LoadGeneratedBuildings_Patch
         ModUtil.AddBuildingToPlanScreen("Equipment", RecordArchiveConfig.ID, "research");
         ModUtil.AddBuildingToPlanScreen("Equipment", ComputeRoomConfig.ID, "research");
         ModUtil.AddBuildingToPlanScreen("Equipment", VacuumLabConfig.ID, "research");
+        ModUtil.AddBuildingToPlanScreen("Equipment", AcceleratorConfig.ID, "research");
+        ModUtil.AddBuildingToPlanScreen("Equipment", ConfinementConfig.ID, "research");
+        ModUtil.AddBuildingToPlanScreen("Equipment", ObservationNetConfig.ID, "research");
+        ModUtil.AddBuildingToPlanScreen("Equipment", ExtractionFurnaceConfig.ID, "research");
     }
 }
 
@@ -48,6 +52,16 @@ public static class TechItems_IsTechItemComplete_Patch
         if (id == VacuumLabConfig.ID)
         {
             __result = KnowledgeState.Instance != null && KnowledgeState.Instance.IsTierUnlocked(3);
+            return;
+        }
+
+        var upperTier = id == AcceleratorConfig.ID ? 4 :
+            id == ConfinementConfig.ID ? 5 :
+            id == ObservationNetConfig.ID ? 6 :
+            id == ExtractionFurnaceConfig.ID ? 7 : 0;
+        if (upperTier != 0)
+        {
+            __result = KnowledgeState.Instance != null && KnowledgeState.Instance.IsTierUnlocked(upperTier);
             return;
         }
 

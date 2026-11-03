@@ -7,17 +7,25 @@ namespace IncrementalResearch;
 // See docs/spec-tiers-2-3.md.
 public abstract class TierFacility : KMonoBehaviour, ISim200ms, ISidescreenButtonControl
 {
-    private static readonly Dictionary<int, List<TierFacility>> Facilities = new Dictionary<int, List<TierFacility>>
+    private static readonly Dictionary<int, List<TierFacility>> Facilities = CreateFacilityLists();
+
+    private static Dictionary<int, List<TierFacility>> CreateFacilityLists()
     {
-        { 2, new List<TierFacility>() },
-        { 3, new List<TierFacility>() },
-    };
+        var lists = new Dictionary<int, List<TierFacility>>();
+        for (var tier = 2; tier <= KnowledgeRules.MaxTier; tier++)
+        {
+            lists[tier] = new List<TierFacility>();
+        }
+
+        return lists;
+    }
 
     private static readonly Operational.Flag EnvironmentFlag =
         new Operational.Flag("IncrementalResearch.Environment", Operational.Flag.Type.Requirement);
 
     [MyCmpGet] private Operational operational;
     [MyCmpGet] private KSelectable selectable;
+    [MyCmpGet] private Building tierBuilding;
     private StatusItem shownProblem;
 
     public abstract int Tier { get; }
@@ -30,6 +38,9 @@ public abstract class TierFacility : KMonoBehaviour, ISim200ms, ISidescreenButto
 
     // Heat given off while running, on top of the building's own self heat. Grows with the expansions.
     protected virtual float ExtraHeatKilowatts => 0f;
+
+    // Electric power (kW) drawn while running; 0 leaves the power draw of the building definition alone.
+    protected virtual float PowerKilowatts => 0f;
 
     public static bool AnyOperational(int tier)
     {
@@ -68,6 +79,13 @@ public abstract class TierFacility : KMonoBehaviour, ISim200ms, ISidescreenButto
 
     public void Sim200ms(float dt)
     {
+        var power = PowerKilowatts;
+        if (power > 0f && tierBuilding != null)
+        {
+            // The definition is shared, but there is only one such facility per world and the value is colony-wide.
+            tierBuilding.Def.EnergyConsumptionWhenActive = power * 1000f;
+        }
+
         var problem = FindProblem();
         operational.SetFlag(EnvironmentFlag, problem == null);
         if (problem != shownProblem)

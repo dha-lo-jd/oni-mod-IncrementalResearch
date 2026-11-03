@@ -39,7 +39,7 @@ public sealed class UpgradeDef
     // 0 for upgrades that apply to every tier.
     public int Tier;
     // Cost in whole units of the currency.
-    public long Cost;
+    public double Cost;
     public UpgradeEffect Effect;
     public double Value;
     // Unlocks (becomes visible) once the tier has been expanded this many times...
@@ -77,6 +77,14 @@ public static class Upgrades
     public const string AutoExpand = "T1_AUTO_EXPAND";
     public const string AutoExpandT2 = "T2_AUTO_EXPAND";
     public const string AutoExpandT3 = "T3_AUTO_EXPAND";
+    public const string Focus = "T4_FOCUS";
+    public const string Resonance = "T5_RESONANCE";
+    public const string Aperture = "T6_APERTURE";
+    public const string Channel = "T7_CHANNEL";
+    public const string AutoExpandT4 = "T4_AUTO_EXPAND";
+    public const string AutoExpandT5 = "T5_AUTO_EXPAND";
+    public const string AutoExpandT6 = "T6_AUTO_EXPAND";
+    public const string AutoExpandT7 = "T7_AUTO_EXPAND";
     public const string AutoExpandMi = "M_AUTO_EXPAND";
     public const string HeadStart = "M_HEADSTART";
     public const string Discount = "M_DISCOUNT";
@@ -159,6 +167,50 @@ public static class Upgrades
         {
             Id = AutoExpandT3, Name = STRINGS.UI.UPGRADES.T3_AUTO_EXPAND.NAME,
             Description = STRINGS.UI.UPGRADES.T3_AUTO_EXPAND.DESC, Tier = 3, Cost = 400000000,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
+            Id = Focus, Name = STRINGS.UI.UPGRADES.T4_FOCUS.NAME, Description = STRINGS.UI.UPGRADES.T4_FOCUS.DESC,
+            Tier = 4, Cost = 1e13d, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 5,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandT4, Name = STRINGS.UI.UPGRADES.T4_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T4_AUTO_EXPAND.DESC, Tier = 4, Cost = 1e14d,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
+            Id = Resonance, Name = STRINGS.UI.UPGRADES.T5_RESONANCE.NAME, Description = STRINGS.UI.UPGRADES.T5_RESONANCE.DESC,
+            Tier = 5, Cost = 3e14d, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 5,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandT5, Name = STRINGS.UI.UPGRADES.T5_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T5_AUTO_EXPAND.DESC, Tier = 5, Cost = 3e15d,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
+            Id = Aperture, Name = STRINGS.UI.UPGRADES.T6_APERTURE.NAME, Description = STRINGS.UI.UPGRADES.T6_APERTURE.DESC,
+            Tier = 6, Cost = 1e16d, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 5,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandT6, Name = STRINGS.UI.UPGRADES.T6_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T6_AUTO_EXPAND.DESC, Tier = 6, Cost = 1e17d,
+            Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
+        },
+        new UpgradeDef
+        {
+            Id = Channel, Name = STRINGS.UI.UPGRADES.T7_CHANNEL.NAME, Description = STRINGS.UI.UPGRADES.T7_CHANNEL.DESC,
+            Tier = 7, Cost = 3e17d, Effect = UpgradeEffect.ProductionMultiplier, Value = 2d, RequiredExpansions = 5,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandT7, Name = STRINGS.UI.UPGRADES.T7_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.T7_AUTO_EXPAND.DESC, Tier = 7, Cost = 3e18d,
             Effect = UpgradeEffect.AutoExpandInsight, Value = 0d, RequiredExpansions = 12, PersistsOnShift = true,
         },
         new UpgradeDef
