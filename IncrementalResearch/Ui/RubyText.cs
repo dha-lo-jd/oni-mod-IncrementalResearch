@@ -4,20 +4,21 @@ using System.Text.RegularExpressions;
 
 namespace IncrementalResearch.Ui;
 
-// Converts the markup {base|ruby} into TextMeshPro tags that draw the ruby small, above the base text.
+// Converts the markup [base|ruby] into TextMeshPro tags that draw the ruby small, above the base text.
 // TextMeshPro has no ruby support, so the layout is built from <size>, <voffset> and <space>,
 // assuming full-width (1 em) characters for the base text and 0.5 em for the ruby.
 // Text without the markup passes through unchanged.
+// Square brackets are used because the game's translation loader rejects braces in translated strings.
 internal static class RubyText
 {
     private const float RubyScale = 0.5f;
     private const float RubyRise = 0.95f;
 
-    private static readonly Regex Pattern = new Regex(@"\{([^{}|]+)\|([^{}|]+)\}", RegexOptions.Compiled);
+    private static readonly Regex Pattern = new Regex(@"\[([^\[\]|]+)\|([^\[\]|]+)\]", RegexOptions.Compiled);
 
     public static string Convert(string text)
     {
-        if (string.IsNullOrEmpty(text) || text.IndexOf('{') < 0)
+        if (string.IsNullOrEmpty(text) || text.IndexOf('[') < 0)
         {
             return text;
         }
