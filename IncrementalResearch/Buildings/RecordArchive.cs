@@ -9,6 +9,8 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
     private static readonly List<RecordArchive> Instances = new List<RecordArchive>();
 
     [MyCmpGet] private Operational operational;
+    [MyCmpGet] private Storage storage;
+    [MyCmpGet] private ManualDeliveryKG delivery;
 
     public static bool AnyExists => Instances.Count > 0;
 
@@ -28,6 +30,44 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
         }
     }
 
+    // Data Banks delivered to the archive, which a singularity consumes.
+    public static int DatabanksStored
+    {
+        get
+        {
+            var total = 0;
+            foreach (var archive in Instances)
+            {
+                total += archive.StoredCount;
+            }
+
+            return total;
+        }
+    }
+
+    public static bool ConsumeDatabanks(int count)
+    {
+        if (DatabanksStored < count)
+        {
+            return false;
+        }
+
+        foreach (var archive in Instances)
+        {
+            var take = System.Math.Min(count, archive.StoredCount);
+            if (take > 0)
+            {
+                archive.storage.ConsumeIgnoringDisease(DatabankHelper.TAG, take);
+                count -= take;
+            }
+        }
+
+        return count <= 0;
+    }
+
+    private int StoredCount =>
+        storage == null ? 0 : (int)System.Math.Floor(storage.GetAmountAvailable(DatabankHelper.TAG) + 0.001f);
+
     protected override void OnSpawn()
     {
         base.OnSpawn();
@@ -44,6 +84,15 @@ public sealed class RecordArchive : KMonoBehaviour, ISim200ms, ISidescreenButton
     {
         // Power is only drawn while the building is active.
         operational.SetActive(operational.IsOperational);
+
+        // Duplicants only fetch Data Banks while a singularity is in sight, and no more than it needs.
+        if (delivery != null)
+        {
+            var state = KnowledgeState.Instance;
+            var wanted = state != null && state.SingularityVisible ? (float)state.DatabanksRequired : 0f;
+            delivery.capacity = wanted;
+            delivery.refillMass = wanted;
+        }
     }
 
     public string SidescreenButtonText

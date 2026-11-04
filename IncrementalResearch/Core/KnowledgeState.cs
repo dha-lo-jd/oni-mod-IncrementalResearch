@@ -61,6 +61,11 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private bool tier5Unlocked;
     [Serialize] private bool tier6Unlocked;
     [Serialize] private bool tier7Unlocked;
+    // Singularity (see docs/spec-singularity.md). Critical Constant (CC) and its expansions survive a singularity.
+    [Serialize] private int singularityCount;
+    [Serialize] private int criticalConstant;
+    [Serialize] private int scaleCcProduction;
+    [Serialize] private int scaleCcMi;
     // Bit i is set once tutorial dialog i has been shown. tutorialStage is the old counter, kept for old saves.
     [Serialize] private int tutorialFlags;
 
@@ -96,8 +101,15 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     // Everything that multiplies the production of a tier except the built-up performance.
     public double TierMultiplier(int tier)
     {
-        return ProductionMultiplier(tier) * MetaInsightMultiplier * SchoolMultiplier(tier);
+        return ProductionMultiplier(tier) * MetaInsightMultiplier * SchoolMultiplier(tier) * CcProductionMultiplier;
     }
+
+    public int SingularityCount => singularityCount;
+    public int CriticalConstant => criticalConstant;
+    public int ScaleCcProduction => scaleCcProduction;
+    public int ScaleCcMi => scaleCcMi;
+    public double CcProductionMultiplier => Math.Pow(KnowledgeRules.CcProductionStep, scaleCcProduction);
+    public double CcMiGainMultiplier => Math.Pow(KnowledgeRules.CcMiGainStep, scaleCcMi);
 
     public bool IsTierUnlocked(int tier)
     {
@@ -153,7 +165,20 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     // Rate the idle game runs on; see KnowledgeRules.BaseRateReference.
     private double EffectiveBaseRate => KnowledgeRules.EffectiveBaseRate(baseRate);
 
-    public BigInteger MetaInsightGain => KnowledgeRules.MiGain(produced);
+    public BigInteger MetaInsightGain
+    {
+        get
+        {
+            var gain = KnowledgeRules.MiGain(produced);
+            if (scaleCcMi > 0 && gain.Sign > 0)
+            {
+                gain = gain * new BigInteger(Math.Round(CcMiGainMultiplier * 1000d)) / 1000;
+            }
+
+            return gain;
+        }
+    }
+
     public bool CanShift => MetaInsightGain >= 1;
     public BigInteger NextMiExpansionCost => KnowledgeRules.MiExpansionCost(scaleMi);
 
@@ -376,13 +401,19 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
     private BigInteger Balance(UpgradeCurrency currency)
     {
-        return currency == UpgradeCurrency.Insight ? knowledge : metaInsight;
+        switch (currency)
+        {
+            case UpgradeCurrency.Insight: return knowledge;
+            case UpgradeCurrency.MetaInsight: return metaInsight;
+            default: return criticalConstant;
+        }
     }
 
     // Visible once the tier has been expanded and the colony has shifted enough, and the required upgrade is bought.
     public bool IsUpgradeVisible(UpgradeDef def)
     {
         return !HasUpgrade(def.Id) && GetScale(def.IsGlobal ? 1 : def.Tier) >= def.RequiredExpansions && shiftCount >= def.RequiredShifts &&
+               singularityCount >= def.RequiredSingularities &&
                (def.RequiredUpgradeId == null || HasUpgrade(def.RequiredUpgradeId));
     }
 
@@ -416,9 +447,13 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         {
             Spend(def.CostAmount);
         }
-        else
+        else if (def.Currency == UpgradeCurrency.MetaInsight)
         {
             metaInsight -= def.CostAmount;
+        }
+        else
+        {
+            criticalConstant -= (int)def.CostAmount;
         }
 
         upgrades.Add(def.Id);
@@ -437,6 +472,11 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     {
         metaInsight += amount;
         metaInsightEarned += amount;
+    }
+
+    public void DebugAddCriticalConstant(int amount)
+    {
+        criticalConstant += amount;
     }
 
     // Debug: while set, production is infinite. Not saved, so it ends with the session.
@@ -468,6 +508,89 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
 
         metaInsight -= cost;
         scaleMi++;
+        return true;
+    }
+
+    // Critical Constant expansions: kind 0 raises production, kind 1 raises the Meta-Insight gained by a shift.
+    public int NextCcExpansionCost(int kind)
+    {
+        return KnowledgeRules.CcExpansionCost(kind == 0 ? scaleCcProduction : scaleCcMi);
+    }
+
+    public bool CanExpandCc(int kind)
+    {
+        return criticalConstant >= NextCcExpansionCost(kind);
+    }
+
+    public bool TryExpandCc(int kind)
+    {
+        var cost = NextCcExpansionCost(kind);
+        if (criticalConstant < cost)
+        {
+            return false;
+        }
+
+        criticalConstant -= cost;
+        if (kind == 0)
+        {
+            scaleCcProduction++;
+        }
+        else
+        {
+            scaleCcMi++;
+        }
+
+        return true;
+    }
+
+    // The singularity is shown once the last blueprint is unlocked, or once the colony has had one.
+    public bool SingularityVisible => unlocked[KnowledgeRules.MaxTier] || singularityCount > 0;
+    public int DatabanksRequired => KnowledgeRules.DatabanksRequired(singularityCount);
+    public int DatabanksStored => RecordArchive.DatabanksStored;
+    public int NextCcGain => KnowledgeRules.CcGain(singularityCount);
+
+    public bool SingularityConditionsMet =>
+        unlocked[KnowledgeRules.MaxTier] && shiftCount >= KnowledgeRules.SingularityMinShifts;
+
+    public bool CanSingularity => SingularityConditionsMet && DatabanksStored >= DatabanksRequired;
+
+    // Singularity: resets the whole idle game except Critical Constant, its expansions and its upgrades.
+    public bool TrySingularity()
+    {
+        if (!CanSingularity || !RecordArchive.ConsumeDatabanks(DatabanksRequired))
+        {
+            return false;
+        }
+
+        criticalConstant += NextCcGain;
+        singularityCount++;
+        for (var tier = 1; tier <= KnowledgeRules.MaxTier; tier++)
+        {
+            scales[tier] = 0;
+            bonuses[tier] = 0d;
+            if (tier > 1)
+            {
+                unlocked[tier] = false;
+            }
+        }
+
+        knowledge = BigInteger.Zero;
+        produced = BigInteger.Zero;
+        knowledgeRemainder = 0d;
+        metaInsight = BigInteger.Zero;
+        metaInsightEarned = BigInteger.Zero;
+        shiftCount = 0;
+        scaleMi = 0;
+        schoolId = "";
+        foreach (var def in Upgrades.All)
+        {
+            if (def.Currency != UpgradeCurrency.CriticalConstant)
+            {
+                upgrades.Remove(def.Id);
+            }
+        }
+
+        RefreshBuildMenu();
         return true;
     }
 
@@ -597,8 +720,38 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             }
         }
 
+        if (IsAutomationActive(Upgrades.AutoMiUpgrade))
+        {
+            foreach (var def in Upgrades.All)
+            {
+                if (def.Currency == UpgradeCurrency.MetaInsight)
+                {
+                    TryBuyUpgrade(def);
+                }
+            }
+        }
+
         // Upgrades come first, then expansions with what is left.
         AutoExpand();
+
+        if (IsAutomationActive(Upgrades.AutoExpandCc))
+        {
+            for (var i = 0; i < MaxAutoPurchasesPerTick; i++)
+            {
+                // The cheaper of the two expansions first, so that neither starves the other.
+                var kind = NextCcExpansionCost(0) <= NextCcExpansionCost(1) ? 0 : 1;
+                if (!TryExpandCc(kind) && !TryExpandCc(1 - kind))
+                {
+                    break;
+                }
+            }
+        }
+
+        if (IsAutomationActive(Upgrades.AutoShift) && CanShift &&
+            MetaInsightGain * KnowledgeRules.AutoShiftDivisor >= metaInsightEarned)
+        {
+            TryShift(schoolId);
+        }
 
         var newIdleMode = researchComplete && RecordArchive.AnyOperational;
         if (newIdleMode != idleMode)
@@ -747,6 +900,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
             case 3: return AffordableUpgradeCount() > 0;
             case 4: return CanShift;
             case 5: return SchoolsUnlocked;
+            case 12: return SingularityConditionsMet;
             default: return unlocked[stage - 4];
         }
     }

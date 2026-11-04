@@ -21,12 +21,19 @@ public enum UpgradeEffect
     AutoExpandMetaInsight,
     // Unlocks a convenience feature, identified by the upgrade id.
     Convenience,
+    // Performs a paradigm shift automatically once its gain is large enough.
+    AutoShift,
+    // Buys affordable Meta-Insight upgrades automatically.
+    AutoBuyMetaInsightUpgrades,
+    // Buys Critical Constant expansions automatically while affordable.
+    AutoExpandCriticalConstant,
 }
 
 public enum UpgradeCurrency
 {
     Insight,
     MetaInsight,
+    CriticalConstant,
 }
 
 // A one-time purchase that adds a multiplier or an effect. See docs/spec-upgrades.md.
@@ -46,6 +53,7 @@ public sealed class UpgradeDef
     public int RequiredExpansions;
     // ...and the colony has made this many paradigm shifts.
     public int RequiredShifts;
+    public int RequiredSingularities;
     public string RequiredUpgradeId;
     // Kept by a paradigm shift even though it is bought with Insight (the automation upgrades).
     public bool PersistsOnShift;
@@ -54,9 +62,11 @@ public sealed class UpgradeDef
 
     // Automation can be switched on and off by the player.
     public bool IsAutomation => Effect == UpgradeEffect.AutoBuyUpgrades || Effect == UpgradeEffect.AutoExpandInsight ||
-                                Effect == UpgradeEffect.AutoExpandMetaInsight;
+                                Effect == UpgradeEffect.AutoExpandMetaInsight || Effect == UpgradeEffect.AutoShift ||
+                                Effect == UpgradeEffect.AutoBuyMetaInsightUpgrades ||
+                                Effect == UpgradeEffect.AutoExpandCriticalConstant;
 
-    // Insight is held in thousandths (KnowledgeRules.Scale); Meta-Insight in whole units.
+    // Insight is held in thousandths (KnowledgeRules.Scale); Meta-Insight and Critical Constant in whole units.
     public BigInteger CostAmount =>
         Currency == UpgradeCurrency.Insight ? new BigInteger(Cost) * KnowledgeRules.Scale : new BigInteger(Cost);
 }
@@ -89,6 +99,9 @@ public static class Upgrades
     public const string HeadStart = "M_HEADSTART";
     public const string Discount = "M_DISCOUNT";
     public const string AutoUpgrade = "M_AUTO_UPGRADE";
+    public const string AutoShift = "C_AUTO_SHIFT";
+    public const string AutoMiUpgrade = "C_AUTO_MI_UPGRADE";
+    public const string AutoExpandCc = "C_AUTO_EXPAND";
 
     public static readonly IReadOnlyList<UpgradeDef> All = new List<UpgradeDef>
     {
@@ -236,6 +249,26 @@ public static class Upgrades
             Id = AutoExpandMi, Name = STRINGS.UI.UPGRADES.M_AUTO_EXPAND.NAME,
             Description = STRINGS.UI.UPGRADES.M_AUTO_EXPAND.DESC, Currency = UpgradeCurrency.MetaInsight, Tier = 0,
             Cost = 15, Effect = UpgradeEffect.AutoExpandMetaInsight, Value = 0d, RequiredShifts = 2,
+        },
+        new UpgradeDef
+        {
+            Id = AutoShift, Name = STRINGS.UI.UPGRADES.C_AUTO_SHIFT.NAME,
+            Description = STRINGS.UI.UPGRADES.C_AUTO_SHIFT.DESC, Currency = UpgradeCurrency.CriticalConstant, Tier = 0,
+            Cost = 2, Effect = UpgradeEffect.AutoShift, Value = 0d, RequiredSingularities = 1,
+        },
+        new UpgradeDef
+        {
+            Id = AutoMiUpgrade, Name = STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.NAME,
+            Description = STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.DESC, Currency = UpgradeCurrency.CriticalConstant,
+            Tier = 0, Cost = 3, Effect = UpgradeEffect.AutoBuyMetaInsightUpgrades, Value = 0d,
+            RequiredSingularities = 1,
+        },
+        new UpgradeDef
+        {
+            Id = AutoExpandCc, Name = STRINGS.UI.UPGRADES.C_AUTO_EXPAND.NAME,
+            Description = STRINGS.UI.UPGRADES.C_AUTO_EXPAND.DESC, Currency = UpgradeCurrency.CriticalConstant,
+            Tier = 0, Cost = 3, Effect = UpgradeEffect.AutoExpandCriticalConstant, Value = 0d,
+            RequiredSingularities = 1,
         },
     };
 }

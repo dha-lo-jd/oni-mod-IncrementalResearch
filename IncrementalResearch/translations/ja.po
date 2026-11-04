@@ -856,3 +856,95 @@ msgstr ""
 "\n"
 "\n"
 "コヒーレンス観測ネットを十分に拡張したので、最後の設備の設計図が完成しました。知見縮退抽出炉(設備メニューの研究タブ)を建てられるようになります。鋼鉄、ガラス、セラミックで建設し、底面から上に長方形の範囲をタイルのない状態で空けてください(拡張するほど広がり、最大で幅32、高さ16です)。稼働している間、コヒーレンス観測ネットの性能を積み上げます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.BUY_CC"
+msgid "Buy ({0} CC)"
+msgstr "購入(CC {0})"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_SHIFT.NAME"
+msgid "Automatic Shift"
+msgstr "自動パラダイムシフト"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_SHIFT.DESC"
+msgid "Automatically makes a paradigm shift once the Meta-Insight it would give reaches a quarter of what has been earned so far."
+msgstr "得られるメタ知見が、これまでの獲得量の4分の1に達したら、自動でパラダイムシフトする。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.NAME"
+msgid "Delegated Purchasing"
+msgstr "購入の委任"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.DESC"
+msgid "Automatically buys affordable Meta-Insight upgrades."
+msgstr "買えるメタ知見のアップグレードを自動で購入する。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_EXPAND.NAME"
+msgid "Self-Adjusting Constants"
+msgstr "定数の自動調整"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_EXPAND.DESC"
+msgid "Automatically buys Critical Constant expansions whenever affordable."
+msgstr "買えるときに臨界定数の拡張を自動で購入する。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.HEADER"
+msgid "Singularity"
+msgstr "シンギュラリティ"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.STATUS"
+msgid "Singularities: {0}    Critical Constant: {1} CC"
+msgstr "シンギュラリティ: {0}回    臨界定数: {1} CC"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CC_NOTE"
+msgid "Critical Constant (CC): a constant fixed by a singularity. Not a liquid."
+msgstr "臨界定数(CC): シンギュラリティで確定した定数。液体ではない。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.NEED"
+msgid "Needs: the last blueprint unlocked, and {0} paradigm shifts (now {1})."
+msgstr "条件: 最後の設備の設計図の解禁と、パラダイムシフト{0}回(現在{1}回)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.DATABANKS"
+msgid "Data Banks delivered to the Record Archive: {0} / {1}"
+msgstr "記録保管庫に納品されたデータバンク: {0} / {1}"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.BUTTON"
+msgid "Singularity (+{0} CC)"
+msgstr "シンギュラリティ(+{0} CC)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.BUTTON_LOCKED"
+msgid "Singularity (conditions not met)"
+msgstr "シンギュラリティ(条件未達)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CC_PRODUCTION"
+msgid "Constant of production (now x{0}): expand ({1} CC)"
+msgstr "生産の定数(現在 ×{0}): 拡張({1} CC)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CC_MI"
+msgid "Constant of Meta-Insight (gain now x{0}): expand ({1} CC)"
+msgstr "メタ知見の定数(獲得量 現在 ×{0}): 拡張({1} CC)"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CONFIRM_TITLE"
+msgid "Singularity"
+msgstr "シンギュラリティ"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CONFIRM_GAIN"
+msgid "You will gain {0} CC. {1} Data Banks in the Record Archive are consumed."
+msgstr "{0} CC を得ます。記録保管庫のデータバンク{1}個を消費します。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CONFIRM_RESET"
+msgid "Insight, Meta-Insight, everything bought with them, the paradigm shift count and the facility blueprints are reset."
+msgstr "知見、メタ知見、それらで買ったもの、パラダイムシフトの回数、設備の設計図がリセットされます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CONFIRM_KEEP"
+msgid "Critical Constant and everything bought with it are kept. Buildings already built stay as they are."
+msgstr "臨界定数とそれで買ったものは残ります。建てた設備には何も起こりません。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.CONFIRM_OK"
+msgid "Singularity"
+msgstr "シンギュラリティ"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE13_TITLE"
+msgid "Singularity"
+msgstr "シンギュラリティ"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE13_BODY"
+msgid "Everything for a singularity is in sight. Deliver Data Banks to the Record Archive (Duplicants carry them in); the Insight tab shows how many are needed. A singularity resets the idle game and grants Critical Constant (CC), which buys permanent expansions and automation."
+msgstr "シンギュラリティが視野に入りました。記録保管庫にデータバンクを納品してください(複製人間が運び込みます)。必要な数は知見タブに表示されます。シンギュラリティは放置ゲームをリセットする代わりに、臨界定数(CC)をもたらします。CCは、永続する拡張と自動化の購入に使えます。"

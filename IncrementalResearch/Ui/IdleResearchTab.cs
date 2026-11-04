@@ -24,6 +24,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private const float UpgradeHeaderTop = 0f;
     private const float UpgradeHeaderTopWithParadigm = 180f;
     private const float SchoolBlockHeight = 100f;
+    private const float SingularityBlockHeight = 290f;
 
     private ResearchScreen screen;
     private RectTransform host;
@@ -64,6 +65,17 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private Button miExpandButton;
     private LocText miExpandLabel;
     private LocText purchasedLabel;
+    private GameObject singularityRoot;
+    private LocText singularityStatus;
+    private LocText singularityNote;
+    private LocText singularityNeed;
+    private LocText singularityDatabanks;
+    private Button singularityButton;
+    private LocText singularityButtonLabel;
+    private Button ccProductionButton;
+    private LocText ccProductionLabel;
+    private Button ccMiButton;
+    private LocText ccMiLabel;
     private LocText automationHeader;
     private readonly List<(UpgradeDef def, Button button, LocText label)> automationToggles =
         new List<(UpgradeDef, Button, LocText)>();
@@ -217,6 +229,22 @@ internal sealed class IdleResearchTab : MonoBehaviour
             AddSchoolButton(lower, school.Id, school.Name.text, ref pickX);
         }
 
+        var singularity = UiFactory.CreateRect("Singularity", lower, 0f, 0f, 1100f, SingularityBlockHeight);
+        singularityRoot = singularity.gameObject;
+        UiFactory.CreateLabel(singularity, STRINGS.UI.SINGULARITY.HEADER, 40f, 0f, 600f, 34f, fontSize: 22f);
+        singularityStatus = UiFactory.CreateLabel(singularity, "", 60f, 40f, 960f, 30f);
+        singularityNote = UiFactory.CreateLabel(singularity, STRINGS.UI.SINGULARITY.CC_NOTE, 60f, 72f, 960f, 30f);
+        UiFactory.SetAutoSize(singularityNote, 12f, 18f);
+        singularityNeed = UiFactory.CreateLabel(singularity, "", 60f, 106f, 960f, 30f);
+        UiFactory.SetAutoSize(singularityNeed, 12f, 20f);
+        singularityDatabanks = UiFactory.CreateLabel(singularity, "", 60f, 140f, 960f, 30f);
+        UiFactory.SetAutoSize(singularityDatabanks, 12f, 20f);
+        singularityButton = UiFactory.CreateButton(singularity, "", 60f, 178f, 460f, 40f, DoSingularity,
+            out singularityButtonLabel);
+        ccProductionButton = UiFactory.CreateButton(singularity, "", 60f, 228f, 460f, 40f, () => ExpandCc(0),
+            out ccProductionLabel);
+        ccMiButton = UiFactory.CreateButton(singularity, "", 540f, 228f, 480f, 40f, () => ExpandCc(1), out ccMiLabel);
+
         upgradesHeader = UiFactory.CreateLabel(lower, STRINGS.UI.UPGRADES.HEADER, 40f, UpgradeHeaderTop, 600f, 34f, fontSize: 22f);
         foreach (var def in Upgrades.All)
         {
@@ -313,6 +341,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
                      ("+1e6", () => KnowledgeState.Instance?.DebugAddInsight(1000000)),
                      ("+1e9", () => KnowledgeState.Instance?.DebugAddInsight(1000000000)),
                      ("+10 MI", () => KnowledgeState.Instance?.DebugAddMetaInsight(10)),
+                     ("+5 CC", () => KnowledgeState.Instance?.DebugAddCriticalConstant(5)),
                      ("Reset tutorial", () => KnowledgeState.Instance?.DebugResetTutorial()),
                      ("Infinite on/off", () => KnowledgeState.Instance?.DebugToggleInfiniteProduction()),
                  })
@@ -377,6 +406,27 @@ internal sealed class IdleResearchTab : MonoBehaviour
             KnowledgeState.Instance?.TryShift(school);
             Refresh();
         });
+    }
+
+    private void DoSingularity()
+    {
+        var state = KnowledgeState.Instance;
+        if (state == null || !state.CanSingularity)
+        {
+            return;
+        }
+
+        SingularityDialog.Show(state.NextCcGain, state.DatabanksRequired, () =>
+        {
+            KnowledgeState.Instance?.TrySingularity();
+            Refresh();
+        });
+    }
+
+    private void ExpandCc(int kind)
+    {
+        KnowledgeState.Instance?.TryExpandCc(kind);
+        Refresh();
     }
 
     private void ExpandMi()
@@ -566,10 +616,41 @@ internal sealed class IdleResearchTab : MonoBehaviour
                 : string.Format(STRINGS.UI.SCHOOLS.CURRENT, current.Name.text + " - " + current.Description.text));
         }
 
-        RefreshUpgrades(state, paradigm, schools);
+        var singularityShown = state.SingularityVisible;
+        singularityRoot.SetActive(singularityShown);
+        var singularityTop = (paradigm ? UpgradeHeaderTopWithParadigm : UpgradeHeaderTop) +
+                             (schools ? SchoolBlockHeight : 0f);
+        if (singularityShown)
+        {
+            UiFactory.Place((RectTransform)singularityRoot.transform, 0f, singularityTop, 1100f,
+                SingularityBlockHeight);
+            RefreshSingularity(state);
+        }
+
+        RefreshUpgrades(state, paradigm, schools, singularityShown ? SingularityBlockHeight : 0f);
     }
 
-    private void RefreshUpgrades(KnowledgeState state, bool paradigm, bool schools)
+    private void RefreshSingularity(KnowledgeState state)
+    {
+        SetText(singularityStatus, string.Format(STRINGS.UI.SINGULARITY.STATUS, state.SingularityCount,
+            state.CriticalConstant));
+        SetText(singularityNeed, string.Format(STRINGS.UI.SINGULARITY.NEED, KnowledgeRules.SingularityMinShifts,
+            state.ShiftCount));
+        SetText(singularityDatabanks, string.Format(STRINGS.UI.SINGULARITY.DATABANKS, state.DatabanksStored,
+            state.DatabanksRequired));
+        SetText(singularityButtonLabel, state.CanSingularity
+            ? string.Format(STRINGS.UI.SINGULARITY.BUTTON, state.NextCcGain)
+            : STRINGS.UI.SINGULARITY.BUTTON_LOCKED.text);
+        SetInteractable(singularityButton, state.CanSingularity);
+        SetText(ccProductionLabel, string.Format(STRINGS.UI.SINGULARITY.CC_PRODUCTION,
+            NumberFormat.Format(state.CcProductionMultiplier), state.NextCcExpansionCost(0)));
+        SetInteractable(ccProductionButton, state.CanExpandCc(0));
+        SetText(ccMiLabel, string.Format(STRINGS.UI.SINGULARITY.CC_MI,
+            NumberFormat.Format(state.CcMiGainMultiplier), state.NextCcExpansionCost(1)));
+        SetInteractable(ccMiButton, state.CanExpandCc(1));
+    }
+
+    private void RefreshUpgrades(KnowledgeState state, bool paradigm, bool schools, float extraTop)
     {
         var headerTop = paradigm ? UpgradeHeaderTopWithParadigm : UpgradeHeaderTop;
         if (schools)
@@ -577,6 +658,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
             headerTop += SchoolBlockHeight;
         }
 
+        headerTop += extraTop;
         UiFactory.Place((RectTransform)upgradesHeader.transform, 40f, headerTop, 600f, 34f);
         var y = headerTop + 40f;
         foreach (var row in upgradeRows)
@@ -592,7 +674,9 @@ internal sealed class IdleResearchTab : MonoBehaviour
             y += UpgradeRowHeight;
             SetText(row.BuyLabel, row.Def.Currency == UpgradeCurrency.Insight
                 ? string.Format(STRINGS.UI.UPGRADES.BUY, NumberFormat.FormatScaled(row.Def.CostAmount))
-                : string.Format(STRINGS.UI.UPGRADES.BUY_MI, NumberFormat.FormatWhole(row.Def.CostAmount)));
+                : row.Def.Currency == UpgradeCurrency.MetaInsight
+                    ? string.Format(STRINGS.UI.UPGRADES.BUY_MI, NumberFormat.FormatWhole(row.Def.CostAmount))
+                    : string.Format(STRINGS.UI.UPGRADES.BUY_CC, NumberFormat.FormatWhole(row.Def.CostAmount)));
             SetInteractable(row.Buy, state.CanBuyUpgrade(row.Def));
         }
 

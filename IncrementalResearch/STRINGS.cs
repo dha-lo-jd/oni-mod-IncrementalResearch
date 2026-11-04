@@ -93,6 +93,9 @@ public static class STRINGS
                 "<b>Ignorance Is Power</b>\n\n" +
                 "<i>The moment has finally come. Insight is no longer something to search for and find. A sage once preached 'knowing that you know nothing', and the Duplicants have realized it literally: they degenerate ignorance itself and extract knowledge from it.\n\n\"Fortunately we know next to nothing, and remain lost forever.\"  - Albert L. Davoski</i>\n\n\n" +
                 "The Observation Net has been expanded far enough to draw up the final facility. The Insight Degeneracy Extraction Furnace (Equipment menu, Research tab) is now available. Build it from steel, glass and ceramic, and keep a rectangle of cells above its base clear of tiles (up to 32 wide and 16 tall; it grows as you expand it). While it runs, it builds up the performance of the Observation Net.";
+            public static LocString STAGE13_TITLE = "Singularity";
+            public static LocString STAGE13_BODY =
+                "Everything for a singularity is in sight. Deliver Data Banks to the Record Archive (Duplicants carry them in); the Insight tab shows how many are needed. A singularity resets the idle game and grants Critical Constant (CC), which buys permanent expansions and automation.";
             public static LocString STAGE3_BODY =
                 "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more.";
         }
@@ -102,6 +105,7 @@ public static class STRINGS
             public static LocString HEADER = "Upgrades";
             public static LocString BUY = "Buy ({0} Insight)";
             public static LocString BUY_MI = "Buy ({0} MI)";
+            public static LocString BUY_CC = "Buy ({0} CC)";
             public static LocString PURCHASED = "Purchased: {0}";
             public static LocString BULK_TEN = "x10";
             public static LocString BULK_MAX = "Max";
@@ -156,6 +160,24 @@ public static class STRINGS
             {
                 public static LocString NAME = "Routine Purchasing";
                 public static LocString DESC = "Automatically buys affordable Insight upgrades.";
+            }
+
+            public static class C_AUTO_SHIFT
+            {
+                public static LocString NAME = "Automatic Shift";
+                public static LocString DESC = "Automatically makes a paradigm shift once the Meta-Insight it would give reaches a quarter of what has been earned so far.";
+            }
+
+            public static class C_AUTO_MI_UPGRADE
+            {
+                public static LocString NAME = "Delegated Purchasing";
+                public static LocString DESC = "Automatically buys affordable Meta-Insight upgrades.";
+            }
+
+            public static class C_AUTO_EXPAND
+            {
+                public static LocString NAME = "Self-Adjusting Constants";
+                public static LocString DESC = "Automatically buys Critical Constant expansions whenever affordable.";
             }
 
             public static class T1_AUTO_EXPAND
@@ -282,6 +304,24 @@ public static class STRINGS
             public static LocString CONFIRM_KEEP = "Meta-Insight and everything bought with it are kept.";
             public static LocString CONFIRM_SCHOOL = "Next school: {0}";
             public static LocString CONFIRM_OK = "Shift";
+        }
+
+        public static class SINGULARITY
+        {
+            public static LocString HEADER = "Singularity";
+            public static LocString STATUS = "Singularities: {0}    Critical Constant: {1} CC";
+            public static LocString CC_NOTE = "Critical Constant (CC): a constant fixed by a singularity. Not a liquid.";
+            public static LocString NEED = "Needs: the last blueprint unlocked, and {0} paradigm shifts (now {1}).";
+            public static LocString DATABANKS = "Data Banks delivered to the Record Archive: {0} / {1}";
+            public static LocString BUTTON = "Singularity (+{0} CC)";
+            public static LocString BUTTON_LOCKED = "Singularity (conditions not met)";
+            public static LocString CC_PRODUCTION = "Constant of production (now x{0}): expand ({1} CC)";
+            public static LocString CC_MI = "Constant of Meta-Insight (gain now x{0}): expand ({1} CC)";
+            public static LocString CONFIRM_TITLE = "Singularity";
+            public static LocString CONFIRM_GAIN = "You will gain {0} CC. {1} Data Banks in the Record Archive are consumed.";
+            public static LocString CONFIRM_RESET = "Insight, Meta-Insight, everything bought with them, the paradigm shift count and the facility blueprints are reset.";
+            public static LocString CONFIRM_KEEP = "Critical Constant and everything bought with it are kept. Buildings already built stay as they are.";
+            public static LocString CONFIRM_OK = "Singularity";
         }
 
         public static class SCHOOLS

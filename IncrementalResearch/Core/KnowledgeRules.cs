@@ -217,6 +217,35 @@ public static class KnowledgeRules
             TightenProgress(holdings - 1));
     }
 
+    // Singularity (docs/spec-singularity.md). It needs the last blueprint, a number of paradigm shifts and Data Banks
+    // delivered to the Record Archive; the Data Banks needed grow with every singularity.
+    public const int SingularityMinShifts = 10;
+    public const double DatabankBase = 10d;
+    public const double DatabankGrowth = 1.5d;
+    // Critical Constant (CC) expansions: production multiplier and Meta-Insight gain multiplier per expansion.
+    public const double CcExpansionBaseCost = 2d;
+    public const double CcExpansionGrowth = 1.5d;
+    public const double CcProductionStep = 1.15d;
+    public const double CcMiGainStep = 1.1d;
+    // The automatic paradigm shift waits until the gain is this fraction of the Meta-Insight earned so far.
+    public const int AutoShiftDivisor = 4;
+
+    public static int DatabanksRequired(int singularities)
+    {
+        return (int)Math.Min(int.MaxValue / 2d, Math.Ceiling(DatabankBase * Math.Pow(DatabankGrowth, singularities)));
+    }
+
+    // The nth singularity (counting from 1) grants n CC.
+    public static int CcGain(int singularitiesDone)
+    {
+        return singularitiesDone + 1;
+    }
+
+    public static int CcExpansionCost(int expansions)
+    {
+        return (int)Math.Min(int.MaxValue / 2d, Math.Ceiling(CcExpansionBaseCost * Math.Pow(CcExpansionGrowth, expansions)));
+    }
+
     public static BigInteger TierExpansionCost(int tier, int expansions, double growth, double baseFactor)
     {
         return GrownCost(BaseCost(tier) * baseFactor * Scale, growth, expansions);
