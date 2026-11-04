@@ -113,6 +113,8 @@ public static class STRINGS
             public static LocString AUTOMATION_HEADER = "Automation";
             public static LocString AUTO_ON = "{0}: ON";
             public static LocString AUTO_OFF = "{0}: OFF";
+            public static LocString AUTO_SHIFT_PRE = "Shift at";
+            public static LocString AUTO_SHIFT_POST = "% of Meta-Insight earned";
 
             public static class T1_INDEX
             {
@@ -165,7 +167,7 @@ public static class STRINGS
             public static class C_AUTO_SHIFT
             {
                 public static LocString NAME = "Automatic Shift";
-                public static LocString DESC = "Automatically makes a paradigm shift once the Meta-Insight it would give reaches a quarter of what has been earned so far.";
+                public static LocString DESC = "Automatically makes a paradigm shift once the Meta-Insight it would give reaches the set percentage of what has been earned so far (25% at first).";
             }
 
             public static class C_AUTO_MI_UPGRADE
@@ -311,7 +313,7 @@ public static class STRINGS
             public static LocString HEADER = "Singularity";
             public static LocString STATUS = "Singularities: {0}    Critical Constant: {1} CC";
             public static LocString CC_NOTE = "Critical Constant (CC): a constant fixed by a singularity. Not a liquid.";
-            public static LocString NEED = "Needs: the last blueprint unlocked, and {0} paradigm shifts (now {1}).";
+            public static LocString NEED = "Needs: the last blueprint unlocked, {0} expansions of the last facility (now {1}), and every automatic expansion (now {2}/{3}).";
             public static LocString DATABANKS = "Data Banks delivered to the Record Archive: {0} / {1}";
             public static LocString BUTTON = "Singularity (+{0} CC)";
             public static LocString BUTTON_LOCKED = "Singularity (conditions not met)";

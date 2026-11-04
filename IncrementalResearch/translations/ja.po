@@ -866,8 +866,8 @@ msgid "Automatic Shift"
 msgstr "自動パラダイムシフト"
 
 msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_SHIFT.DESC"
-msgid "Automatically makes a paradigm shift once the Meta-Insight it would give reaches a quarter of what has been earned so far."
-msgstr "得られるメタ知見が、これまでの獲得量の4分の1に達したら、自動でパラダイムシフトする。"
+msgid "Automatically makes a paradigm shift once the Meta-Insight it would give reaches the set percentage of what has been earned so far (25% at first)."
+msgstr "得られるメタ知見が、これまでの獲得量の設定した割合(初期値25%)に達したら、自動でパラダイムシフトする。"
 
 msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.NAME"
 msgid "Delegated Purchasing"
@@ -898,8 +898,8 @@ msgid "Critical Constant (CC): a constant fixed by a singularity. Not a liquid."
 msgstr "臨界定数(CC): シンギュラリティで確定した定数。液体ではない。"
 
 msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.NEED"
-msgid "Needs: the last blueprint unlocked, and {0} paradigm shifts (now {1})."
-msgstr "条件: 最後の設備の設計図の解禁と、パラダイムシフト{0}回(現在{1}回)"
+msgid "Needs: the last blueprint unlocked, {0} expansions of the last facility (now {1}), and every automatic expansion (now {2}/{3})."
+msgstr "条件: 最後の設備の設計図の解禁、最後の設備の拡張{0}回(現在{1}回)、すべての自動拡張の購入(現在{2}/{3})"
 
 msgctxt "IncrementalResearch.STRINGS.UI.SINGULARITY.DATABANKS"
 msgid "Data Banks delivered to the Record Archive: {0} / {1}"
@@ -948,3 +948,11 @@ msgstr "シンギュラリティ"
 msgctxt "IncrementalResearch.STRINGS.UI.TUTORIAL.STAGE13_BODY"
 msgid "Everything for a singularity is in sight. Deliver Data Banks to the Record Archive (Duplicants carry them in); the Insight tab shows how many are needed. A singularity resets the idle game and grants Critical Constant (CC), which buys permanent expansions and automation."
 msgstr "シンギュラリティが視野に入りました。記録保管庫にデータバンクを納品してください(複製人間が運び込みます)。必要な数は知見タブに表示されます。シンギュラリティは放置ゲームをリセットする代わりに、臨界定数(CC)をもたらします。CCは、永続する拡張と自動化の購入に使えます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.AUTO_SHIFT_PRE"
+msgid "Shift at"
+msgstr "累計メタ知見の"
+
+msgctxt "IncrementalResearch.STRINGS.UI.UPGRADES.AUTO_SHIFT_POST"
+msgid "% of Meta-Insight earned"
+msgstr "% で自動実行"

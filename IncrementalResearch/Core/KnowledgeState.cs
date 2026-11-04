@@ -26,6 +26,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     [Serialize] private string upgradesText = "";
     // Ids of the automation upgrades the player has switched off, comma separated.
     [Serialize] private string automationOffText = "";
+    [Serialize] private int autoShiftPercent = KnowledgeRules.AutoShiftDefaultPercent;
     // Paradigm shift (see docs/spec-paradigm-shift.md). Big numbers are saved as text.
     [Serialize] private string producedText = "0";
     [Serialize] private string metaInsightText = "0";
@@ -359,6 +360,17 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         pendingPoints += points * KnowledgeRules.PointWeight(researchTypeId);
     }
 
+    // Threshold of the automatic paradigm shift, in percent of the Meta-Insight earned so far.
+    public int AutoShiftPercent => autoShiftPercent < KnowledgeRules.AutoShiftMinPercent
+        ? KnowledgeRules.AutoShiftDefaultPercent
+        : Math.Min(autoShiftPercent, KnowledgeRules.AutoShiftMaxPercent);
+
+    public void SetAutoShiftPercent(int percent)
+    {
+        autoShiftPercent = Math.Max(KnowledgeRules.AutoShiftMinPercent,
+            Math.Min(KnowledgeRules.AutoShiftMaxPercent, percent));
+    }
+
     public bool HasUpgrade(string id)
     {
         return upgrades.Contains(id);
@@ -549,8 +561,35 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public int DatabanksStored => RecordArchive.DatabanksStored;
     public int NextCcGain => KnowledgeRules.CcGain(singularityCount);
 
+    private static readonly string[] AutoExpandIds =
+    {
+        Upgrades.AutoExpand, Upgrades.AutoExpandT2, Upgrades.AutoExpandT3, Upgrades.AutoExpandT4,
+        Upgrades.AutoExpandT5, Upgrades.AutoExpandT6, Upgrades.AutoExpandT7
+    };
+
+    public int TopTierExpansions => scales[KnowledgeRules.MaxTier];
+    public int AutoExpandTotal => AutoExpandIds.Length;
+
+    public int AutoExpandOwned
+    {
+        get
+        {
+            var count = 0;
+            foreach (var id in AutoExpandIds)
+            {
+                if (HasUpgrade(id))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+    }
+
     public bool SingularityConditionsMet =>
-        unlocked[KnowledgeRules.MaxTier] && shiftCount >= KnowledgeRules.SingularityMinShifts;
+        unlocked[KnowledgeRules.MaxTier] && TopTierExpansions >= KnowledgeRules.SingularityMinTopExpansions &&
+        AutoExpandOwned == AutoExpandTotal;
 
     public bool CanSingularity => SingularityConditionsMet && DatabanksStored >= DatabanksRequired;
 
@@ -748,7 +787,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         }
 
         if (IsAutomationActive(Upgrades.AutoShift) && CanShift &&
-            MetaInsightGain * KnowledgeRules.AutoShiftDivisor >= metaInsightEarned)
+            MetaInsightGain * 100 >= metaInsightEarned * AutoShiftPercent)
         {
             TryShift(schoolId);
         }

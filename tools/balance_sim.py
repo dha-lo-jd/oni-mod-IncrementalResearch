@@ -60,6 +60,12 @@ U = [
  ("M_HEADSTART",0,3,"start",100,0,None,"M",1,True),
  ("M_DISCOUNT",1,8,"disc",0.5,0,None,"M",2,True),
 ]
+# Singularity (docs/spec-singularity.md): needs tier 7, TOP_EXP expansions of tier 7 in the current cycle and every
+# automatic expansion. Data Banks are assumed to be delivered. CC buys production x1.15 and MI gain x1.1 expansions.
+TOP_EXP = 45
+CC_PROD, CC_MI, CC_COST0, CC_COSTG = 1.15, 1.1, 2.0, 1.5
+SING_LOG = []   # (hours, singularity number, shifts done in the run, CC gained)
+AUTOS = ['T1_AUTO_EXPAND','T4_AUTO_EXPAND','T5_AUTO_EXPAND','T6_AUTO_EXPAND','T7_AUTO_EXPAND']
 # Tiers 4-7 are draft values (docs/spec-tiers-4-7.md); NT = number of tiers simulated.
 NT = 3
 SAVE_FACTOR = float(__import__('os').environ.get('SAVE','0'))   # 0 = pure greedy
@@ -68,7 +74,11 @@ GROW = {1:1.15, 2:1.18, 3:1.22, 4:1.25, 5:1.28, 6:1.31, 7:1.34}
 UNLOCK = {2:25, 3:15, 4:30, 5:30, 6:30, 7:30}   # expansions of the tier below
 BONUS = {2:0.002, 3:0.001, 4:0.0005, 5:0.00025, 6:0.0001, 7:0.00005}   # build-up rate of tier t on tier t-1
 
+SHIFT_INFO = []   # (hours, shift number, expansions of tier 7 at the shift, all auto-expansions bought)
 EVENTS = []   # (hours, name) of upgrade purchases, tier unlocks and shifts, for the event spacing report
+
+SING = bool(os.environ.get('SING'))
+
 
 def run(P, hours=100, dt=2.0, verbose=True, label=""):
     gain = P.gain or default_gain
@@ -91,7 +101,7 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
         r = 1.0
         for u in U:
             if u[3]=="mul" and (u[1]==tier or u[1]==0) and has(u[0]): r *= u[4]
-        return r
+        return r * CC_PROD**ccp
     def growth(tier):
         g = GROW[tier]
         for u in U:
@@ -111,6 +121,7 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
     def start_know():
         return 100.0 if has("M_HEADSTART") else 0.0
     know = start_know()
+    sings = 0; cc = 0; ccp = 0; ccm = 0; cc_spent = 0
     while t < end:
         Seff = P.Sref*(P.S/P.Sref)**P.gamma
         mi = multf(P, Mearned, smi)
@@ -151,11 +162,12 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
         if os.environ.get('TL') and shifts==0 and int(t)%300==0 and t>0 and int(t)!=getattr(P,'_lt',-1):
             P._lt=int(t); print('t=%5.1fmin T=%.2g know=%.2g P=%.2g ex=%s'%(t/60,T,know,prod,[ex[i] for i in range(1,NT+1)]))
         # shift decision
-        g = gain(P, T)
+        g = int(gain(P, T) * CC_MI**ccm)
         cyc = t-cycle_start
         if g>=1 and g >= max(1, P.rho*max(Mearned, getattr(P,'mmin',0))):
             EVENTS.append((t/3600,'SHIFT%d'%(shifts+1)))
             rows.append((t/3600, cyc/60, shifts, Mearned, g, peakP, mi))
+            SHIFT_INFO.append((t/3600, shifts+1, ex[7] if NT>=7 else 0, all(has(a) for a in AUTOS if next(x for x in U if x[0]==a)[1]<=NT)))
             Mearned += g; shifts += 1
             # MI purchases
             bal = Mearned-Mspent
@@ -171,6 +183,22 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
             ex = {i:0 for i in range(1,NT+1)}
             ups = set(u for u in ups if next(x for x in U if x[0]==u)[9])
             b = {i:0.0 for i in range(1,NT+1)}; T=0.0; know=start_know(); cycle_start=t
+        if SING and NT>=7 and unl[7] and ex[7]>=TOP_EXP and all(has(a) for a in AUTOS):
+            sings += 1; cc += sings
+            SING_LOG.append((t/3600, sings, shifts, sings))
+            EVENTS.append((t/3600,'SINGULARITY%d'%sings))
+            # Spend CC on the cheaper expansion first, as the automation does.
+            while True:
+                cp = math.ceil(CC_COST0*CC_COSTG**ccp); cm = math.ceil(CC_COST0*CC_COSTG**ccm)
+                c, kind = (cp, 0) if cp <= cm else (cm, 1)
+                if c > cc - cc_spent: break
+                cc_spent += c
+                if kind == 0: ccp += 1
+                else: ccm += 1
+            ex = {i:0 for i in range(1,NT+1)}; ups=set(); mups=set()
+            unl = {i:(i==1) for i in range(1,NT+1)}
+            b = {i:0.0 for i in range(1,NT+1)}; T=0.0; know=start_know(); cycle_start=t
+            Mearned = 0; Mspent = 0; smi = 0; shifts = 0
         t += dt
     if verbose:
         print("==",label,"S=",P.S,"inf" if inf else "", "t_end(h)=",round(t/3600,2),"shifts",shifts)
@@ -235,6 +263,10 @@ if __name__=="__main__":
     rows,inf,t=run(P,hours=H,dt=float(os.environ.get("DT","15")),verbose=False)
     print("base rate %g: first shift at %.2f h, %d shifts, log10(P) at end %.0f%s"%(S,rows[0][0] if rows else -1,len(rows),math.log10(max(rows[-1][5],1)) if rows else 0," (INF)" if inf else ""))
     print(slopes(rows))
+    if SING_LOG:
+        prev=0
+        for h,n,sh,g in SING_LOG:
+            print('singularity %d at %.2fh (+%.1fh), %d shifts in that run'%(n,h,h-prev,sh)); prev=h
     if os.environ.get('EVENTS'):
         prev=0
         for h,n in EVENTS[:int(os.environ.get('EVENTS'))]:

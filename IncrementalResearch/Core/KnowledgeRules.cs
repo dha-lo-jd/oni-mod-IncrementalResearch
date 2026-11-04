@@ -217,9 +217,10 @@ public static class KnowledgeRules
             TightenProgress(holdings - 1));
     }
 
-    // Singularity (docs/spec-singularity.md). It needs the last blueprint, a number of paradigm shifts and Data Banks
-    // delivered to the Record Archive; the Data Banks needed grow with every singularity.
-    public const int SingularityMinShifts = 10;
+    // Singularity (docs/spec-singularity.md). It needs the last blueprint, a number of expansions of the last facility
+    // in the current cycle (reset by a paradigm shift, so shifting repeatedly cannot satisfy it), every automatic
+    // expansion, and Data Banks delivered to the Record Archive; the Data Banks needed grow with every singularity.
+    public const int SingularityMinTopExpansions = 45;
     public const double DatabankBase = 10d;
     public const double DatabankGrowth = 1.5d;
     // Critical Constant (CC) expansions: production multiplier and Meta-Insight gain multiplier per expansion.
@@ -227,8 +228,11 @@ public static class KnowledgeRules
     public const double CcExpansionGrowth = 1.5d;
     public const double CcProductionStep = 1.15d;
     public const double CcMiGainStep = 1.1d;
-    // The automatic paradigm shift waits until the gain is this fraction of the Meta-Insight earned so far.
-    public const int AutoShiftDivisor = 4;
+    // The automatic paradigm shift waits until the gain reaches this percentage of the Meta-Insight earned so far;
+    // the player can change it.
+    public const int AutoShiftDefaultPercent = 25;
+    public const int AutoShiftMinPercent = 1;
+    public const int AutoShiftMaxPercent = 9999;
 
     public static int DatabanksRequired(int singularities)
     {

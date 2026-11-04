@@ -98,6 +98,36 @@ internal static class UiFactory
         label.overflowMode = TextOverflowModes.Ellipsis;
     }
 
+    // A single-line whole-number input. onCommit gets the text when editing ends (Enter or focus lost).
+    public static TMP_InputField CreateNumberInput(Transform parent, string text, float x, float y, float width,
+        float height, int maxDigits, UnityAction<string> onCommit)
+    {
+        var rect = CreateRect("NumberInput", parent, x, y, width, height);
+        var image = rect.gameObject.AddComponent<Image>();
+        image.color = CardColor;
+        var viewport = CreateStretched("Viewport", rect, 8f, 2f, 8f, 2f);
+        viewport.gameObject.AddComponent<RectMask2D>();
+        var label = CreateLabel(viewport, "", 0f, 0f, width - 16f, height - 4f, TextAlignmentOptions.Center);
+        label.rectTransform.anchorMin = Vector2.zero;
+        label.rectTransform.anchorMax = Vector2.one;
+        label.rectTransform.offsetMin = Vector2.zero;
+        label.rectTransform.offsetMax = Vector2.zero;
+
+        // The game's own input field type, so that typing does not trigger the game's hotkeys.
+        // Added while inactive so that its fields are set before it starts.
+        rect.gameObject.SetActive(false);
+        var field = rect.gameObject.AddComponent<KInputTextField>();
+        field.textViewport = viewport;
+        field.textComponent = label;
+        field.targetGraphic = image;
+        field.contentType = TMP_InputField.ContentType.IntegerNumber;
+        field.characterLimit = maxDigits;
+        field.text = text;
+        field.onEndEdit.AddListener(onCommit);
+        rect.gameObject.SetActive(true);
+        return field;
+    }
+
     public static Button CreateButton(Transform parent, string text, float x, float y, float width, float height,
         UnityAction onClick, out LocText label)
     {

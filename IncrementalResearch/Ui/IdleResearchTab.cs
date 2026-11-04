@@ -77,6 +77,9 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private Button ccMiButton;
     private LocText ccMiLabel;
     private LocText automationHeader;
+    private LocText autoShiftPre;
+    private LocText autoShiftPost;
+    private TMP_InputField autoShiftInput;
     private readonly List<(UpgradeDef def, Button button, LocText label)> automationToggles =
         new List<(UpgradeDef, Button, LocText)>();
     private readonly List<UpgradeRow> upgradeRows = new List<UpgradeRow>();
@@ -273,6 +276,11 @@ internal sealed class IdleResearchTab : MonoBehaviour
             automationToggles.Add((def, toggle, label));
         }
 
+        autoShiftPre = UiFactory.CreateLabel(lower, STRINGS.UI.UPGRADES.AUTO_SHIFT_PRE, 600f, 0f, 160f, 40f,
+            TextAlignmentOptions.Right);
+        autoShiftInput = UiFactory.CreateNumberInput(lower, "", 770f, 0f, 90f, 40f, 4, CommitAutoShiftPercent);
+        autoShiftPost = UiFactory.CreateLabel(lower, STRINGS.UI.UPGRADES.AUTO_SHIFT_POST, 868f, 0f, 200f, 40f);
+
         purchasedLabel = UiFactory.CreateLabel(lower, "", 60f, 0f, 960f, 30f);
 
         BuildDebugRow(viewport);
@@ -433,6 +441,22 @@ internal sealed class IdleResearchTab : MonoBehaviour
     {
         KnowledgeState.Instance?.TryExpandMi();
         Refresh();
+    }
+
+    private void CommitAutoShiftPercent(string text)
+    {
+        var state = KnowledgeState.Instance;
+        if (state == null)
+        {
+            return;
+        }
+
+        if (int.TryParse(text, out var percent))
+        {
+            state.SetAutoShiftPercent(percent);
+        }
+
+        autoShiftInput.text = state.AutoShiftPercent.ToString();
     }
 
     private void ToggleAutomation(UpgradeDef def)
@@ -630,12 +654,21 @@ internal sealed class IdleResearchTab : MonoBehaviour
         RefreshUpgrades(state, paradigm, schools, singularityShown ? SingularityBlockHeight : 0f);
     }
 
+    private static void SetInputText(TMP_InputField field, string text)
+    {
+        if (field.text != text)
+        {
+            field.SetTextWithoutNotify(text);
+        }
+    }
+
     private void RefreshSingularity(KnowledgeState state)
     {
         SetText(singularityStatus, string.Format(STRINGS.UI.SINGULARITY.STATUS, state.SingularityCount,
             state.CriticalConstant));
-        SetText(singularityNeed, string.Format(STRINGS.UI.SINGULARITY.NEED, KnowledgeRules.SingularityMinShifts,
-            state.ShiftCount));
+        SetText(singularityNeed, string.Format(STRINGS.UI.SINGULARITY.NEED,
+            KnowledgeRules.SingularityMinTopExpansions, state.TopTierExpansions, state.AutoExpandOwned,
+            state.AutoExpandTotal));
         SetText(singularityDatabanks, string.Format(STRINGS.UI.SINGULARITY.DATABANKS, state.DatabanksStored,
             state.DatabanksRequired));
         SetText(singularityButtonLabel, state.CanSingularity
@@ -693,6 +726,10 @@ internal sealed class IdleResearchTab : MonoBehaviour
             y += 50f;
         }
 
+        var shiftOwned = state.HasUpgrade(Upgrades.AutoShift);
+        autoShiftPre.gameObject.SetActive(shiftOwned);
+        autoShiftInput.gameObject.SetActive(shiftOwned);
+        autoShiftPost.gameObject.SetActive(shiftOwned);
         foreach (var (def, button, label) in automationToggles)
         {
             var owned = state.HasUpgrade(def.Id);
@@ -700,6 +737,17 @@ internal sealed class IdleResearchTab : MonoBehaviour
             if (!owned)
             {
                 continue;
+            }
+
+            if (def.Id == Upgrades.AutoShift)
+            {
+                UiFactory.Place((RectTransform)autoShiftPre.transform, 600f, y + 10f, 160f, 40f);
+                UiFactory.Place((RectTransform)autoShiftInput.transform, 770f, y + 10f, 90f, 40f);
+                UiFactory.Place((RectTransform)autoShiftPost.transform, 868f, y + 10f, 200f, 40f);
+                if (!autoShiftInput.isFocused)
+                {
+                    SetInputText(autoShiftInput, state.AutoShiftPercent.ToString());
+                }
             }
 
             UiFactory.Place((RectTransform)button.transform, 60f, y + 10f, 520f, 40f);
