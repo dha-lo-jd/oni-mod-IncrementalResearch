@@ -188,10 +188,7 @@ public sealed class ObservationNet : ClearanceFacility
     protected override void GetArea(int holdings, int xMin, int xMax, int facilityHeight,
         out int left, out int right, out int height)
     {
-        var length = KnowledgeRules.NetBandLength(holdings);
-        left = length / 2;
-        right = length - left;
-        height = facilityHeight;
+        ClearanceArea.Get(Tier, holdings, xMax - xMin + 1, facilityHeight, out left, out right, out height);
     }
 
     protected override string EnvironmentRequirement => string.Format(STRINGS.UI.TIERS.REQUIRE_BAND,
@@ -206,10 +203,7 @@ public sealed class ExtractionFurnace : ClearanceFacility
     protected override void GetArea(int holdings, int xMin, int xMax, int facilityHeight,
         out int left, out int right, out int height)
     {
-        var extra = Math.Max(0, KnowledgeRules.FurnaceWidth(holdings) - (xMax - xMin + 1));
-        left = extra / 2;
-        right = extra - left;
-        height = KnowledgeRules.FurnaceHeight(holdings);
+        ClearanceArea.Get(Tier, holdings, xMax - xMin + 1, facilityHeight, out left, out right, out height);
     }
 
     protected override string EnvironmentRequirement => string.Format(STRINGS.UI.TIERS.REQUIRE_RECT,

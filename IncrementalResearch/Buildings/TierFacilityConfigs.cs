@@ -204,6 +204,17 @@ public sealed class ObservationNetConfig : IBuildingConfig
     {
         go.AddOrGet<BuildingEnabledButton>();
         go.AddOrGet<ObservationNet>();
+        ClearanceRangeSync.Add(go, 6, 5, 3);
+    }
+
+    public override void DoPostConfigurePreview(BuildingDef def, GameObject go)
+    {
+        ClearanceRangeSync.Add(go, 6, 5, 3);
+    }
+
+    public override void DoPostConfigureUnderConstruction(GameObject go)
+    {
+        ClearanceRangeSync.Add(go, 6, 5, 3);
     }
 }
 
@@ -243,5 +254,16 @@ public sealed class ExtractionFurnaceConfig : IBuildingConfig
     {
         go.AddOrGet<BuildingEnabledButton>();
         go.AddOrGet<ExtractionFurnace>();
+        ClearanceRangeSync.Add(go, 7, 5, 4);
+    }
+
+    public override void DoPostConfigurePreview(BuildingDef def, GameObject go)
+    {
+        ClearanceRangeSync.Add(go, 7, 5, 4);
+    }
+
+    public override void DoPostConfigureUnderConstruction(GameObject go)
+    {
+        ClearanceRangeSync.Add(go, 7, 5, 4);
     }
 }
