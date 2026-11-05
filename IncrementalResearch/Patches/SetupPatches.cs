@@ -10,6 +10,7 @@ public static class SaveGame_OnPrefabInit_Patch
     public static void Postfix(SaveGame __instance)
     {
         __instance.gameObject.AddOrGet<KnowledgeState>();
+        __instance.gameObject.AddOrGet<RewardState>();
     }
 }
 

@@ -221,13 +221,25 @@ public static class KnowledgeRules
     // in the current cycle (reset by a paradigm shift, so shifting repeatedly cannot satisfy it), every automatic
     // expansion, and Data Banks delivered to the Record Archive; the Data Banks needed grow with every singularity.
     public const int SingularityMinTopExpansions = 45;
-    public const double DatabankBase = 10d;
-    public const double DatabankGrowth = 1.5d;
+    // Data Banks needed: DatabankBase + DatabankStep per singularity done, at most DatabankMax.
+    public const int DatabankBase = 10;
+    public const int DatabankStep = 2;
+    public const int DatabankMax = 60;
+    // Critical Constant gained: floor(log10(Meta-Insight earned in this run)) - CcGainOffset, within the limits.
+    public const int CcGainOffset = 5;
+    public const int CcGainMin = 1;
+    public const int CcGainMax = 10;
+    // The gain above is multiplied by this, so that singularities pay in bigger numbers.
+    public const int CcGainScale = 5;
     // Critical Constant (CC) expansions: production multiplier and Meta-Insight gain multiplier per expansion.
     public const double CcExpansionBaseCost = 2d;
-    public const double CcExpansionGrowth = 1.5d;
-    public const double CcProductionStep = 1.15d;
-    public const double CcMiGainStep = 1.1d;
+    public const double CcExpansionGrowth = 1.6d;
+    // The nth expansion (from 0) multiplies by 1 + First * Decay^n, so the first ones are strong and the total
+    // converges to a limit (about x19.8 for production, x4.4 for Meta-Insight gain). The limit keeps a run from
+    // getting shorter than about 30 minutes.
+    public const double CcProductionFirst = 0.7d;
+    public const double CcMiGainFirst = 0.35d;
+    public const double CcStepDecay = 0.8d;
     // The automatic paradigm shift waits until the gain reaches this percentage of the Meta-Insight earned so far;
     // the player can change it.
     public const int AutoShiftDefaultPercent = 25;
@@ -236,13 +248,34 @@ public static class KnowledgeRules
 
     public static int DatabanksRequired(int singularities)
     {
-        return (int)Math.Min(int.MaxValue / 2d, Math.Ceiling(DatabankBase * Math.Pow(DatabankGrowth, singularities)));
+        return Math.Min(DatabankMax, DatabankBase + DatabankStep * singularities);
     }
 
-    // The nth singularity (counting from 1) grants n CC.
-    public static int CcGain(int singularitiesDone)
+    // The gain follows the logarithm of the Meta-Insight earned in the run, so that waiting for a few more paradigm
+    // shifts pays a little, and is limited so that Critical Constant cannot grow without bound.
+    public static int CcGain(BigInteger metaInsightEarned)
     {
-        return singularitiesDone + 1;
+        if (metaInsightEarned < 1)
+        {
+            return CcGainMin;
+        }
+
+        var gain = (int)Math.Floor(BigInteger.Log10(metaInsightEarned)) - CcGainOffset;
+        return Math.Max(CcGainMin, Math.Min(CcGainMax, gain)) * CcGainScale;
+    }
+
+    // Total multiplier after the given number of Critical Constant expansions.
+    public static double CcMultiplier(double first, int expansions)
+    {
+        var result = 1d;
+        var step = first;
+        for (var i = 0; i < expansions; i++)
+        {
+            result *= 1d + step;
+            step *= CcStepDecay;
+        }
+
+        return result;
     }
 
     public static int CcExpansionCost(int expansions)

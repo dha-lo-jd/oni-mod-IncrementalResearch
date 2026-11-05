@@ -25,6 +25,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private const float UpgradeHeaderTopWithParadigm = 180f;
     private const float SchoolBlockHeight = 100f;
     private const float SingularityBlockHeight = 290f;
+    private const float RewardsBlockHeight = 340f;
 
     private ResearchScreen screen;
     private RectTransform host;
@@ -65,6 +66,21 @@ internal sealed class IdleResearchTab : MonoBehaviour
     private Button miExpandButton;
     private LocText miExpandLabel;
     private LocText purchasedLabel;
+    private GameObject rewardsRoot;
+    private LocText rewardsTickets;
+    private LocText rewardsAttrStatus;
+    private LocText rewardsAttrList;
+    private Button attrBuyButton;
+    private LocText attrBuyLabel;
+    private Button attrResetButton;
+    private LocText attrResetLabel;
+    private LocText rewardsMinionName;
+    private LocText rewardsInterestStatus;
+    private Button interestBuyButton;
+    private LocText interestBuyLabel;
+    private Button interestResetButton;
+    private LocText interestResetLabel;
+    private int pickedMinion;
     private GameObject singularityRoot;
     private LocText singularityStatus;
     private LocText singularityNote;
@@ -248,6 +264,28 @@ internal sealed class IdleResearchTab : MonoBehaviour
             out ccProductionLabel);
         ccMiButton = UiFactory.CreateButton(singularity, "", 540f, 228f, 480f, 40f, () => ExpandCc(1), out ccMiLabel);
 
+        var rewards = UiFactory.CreateRect("Rewards", lower, 0f, 0f, 1100f, RewardsBlockHeight);
+        rewardsRoot = rewards.gameObject;
+        UiFactory.CreateLabel(rewards, STRINGS.UI.REWARDS.HEADER, 40f, 0f, 600f, 34f, fontSize: 22f);
+        rewardsTickets = UiFactory.CreateLabel(rewards, "", 60f, 40f, 960f, 30f);
+        UiFactory.SetAutoSize(rewardsTickets, 12f, 20f);
+        rewardsAttrStatus = UiFactory.CreateLabel(rewards, "", 60f, 76f, 960f, 30f);
+        UiFactory.SetAutoSize(rewardsAttrStatus, 12f, 20f);
+        rewardsAttrList = UiFactory.CreateLabel(rewards, "", 60f, 106f, 960f, 30f);
+        UiFactory.SetAutoSize(rewardsAttrList, 12f, 18f);
+        attrBuyButton = UiFactory.CreateButton(rewards, "", 60f, 142f, 560f, 40f, BuyAttr, out attrBuyLabel);
+        attrResetButton = UiFactory.CreateButton(rewards, "", 640f, 142f, 380f, 40f, ResetAttr, out attrResetLabel);
+        UiFactory.CreateLabel(rewards, STRINGS.UI.REWARDS.INTEREST_HEADER, 40f, 196f, 600f, 34f, fontSize: 22f);
+        UiFactory.CreateButton(rewards, STRINGS.UI.REWARDS.PREV, 60f, 232f, 50f, 40f, () => PickMinion(-1), out _);
+        rewardsMinionName = UiFactory.CreateLabel(rewards, "", 120f, 232f, 360f, 40f, TextAlignmentOptions.Center);
+        UiFactory.CreateButton(rewards, STRINGS.UI.REWARDS.NEXT, 490f, 232f, 50f, 40f, () => PickMinion(1), out _);
+        rewardsInterestStatus = UiFactory.CreateLabel(rewards, "", 560f, 232f, 460f, 40f);
+        UiFactory.SetAutoSize(rewardsInterestStatus, 12f, 20f);
+        interestBuyButton = UiFactory.CreateButton(rewards, "", 60f, 284f, 560f, 40f, GrantInterest,
+            out interestBuyLabel);
+        interestResetButton = UiFactory.CreateButton(rewards, "", 640f, 284f, 380f, 40f, ResetInterest,
+            out interestResetLabel);
+
         upgradesHeader = UiFactory.CreateLabel(lower, STRINGS.UI.UPGRADES.HEADER, 40f, UpgradeHeaderTop, 600f, 34f, fontSize: 22f);
         foreach (var def in Upgrades.All)
         {
@@ -350,6 +388,7 @@ internal sealed class IdleResearchTab : MonoBehaviour
                      ("+1e9", () => KnowledgeState.Instance?.DebugAddInsight(1000000000)),
                      ("+10 MI", () => KnowledgeState.Instance?.DebugAddMetaInsight(10)),
                      ("+5 CC", () => KnowledgeState.Instance?.DebugAddCriticalConstant(5)),
+                     ("+3 tickets", () => RewardState.Instance?.DebugAddTickets(3, 1)),
                      ("Reset tutorial", () => KnowledgeState.Instance?.DebugResetTutorial()),
                      ("Infinite on/off", () => KnowledgeState.Instance?.DebugToggleInfiniteProduction()),
                  })
@@ -414,6 +453,63 @@ internal sealed class IdleResearchTab : MonoBehaviour
             KnowledgeState.Instance?.TryShift(school);
             Refresh();
         });
+    }
+
+    private void BuyAttr()
+    {
+        RewardState.Instance?.TryBuyAttr();
+        Refresh();
+    }
+
+    private void ResetAttr()
+    {
+        RewardState.Instance?.TryResetAttr();
+        Refresh();
+    }
+
+    private static List<MinionIdentity> Minions()
+    {
+        return new List<MinionIdentity>(Components.LiveMinionIdentities.Items);
+    }
+
+    private MinionIdentity PickedMinion()
+    {
+        var minions = Minions();
+        if (minions.Count == 0)
+        {
+            return null;
+        }
+
+        pickedMinion = ((pickedMinion % minions.Count) + minions.Count) % minions.Count;
+        return minions[pickedMinion];
+    }
+
+    private void PickMinion(int step)
+    {
+        pickedMinion += step;
+        Refresh();
+    }
+
+    private void GrantInterest()
+    {
+        var minion = PickedMinion();
+        if (minion != null)
+        {
+            RewardState.Instance?.TryGrantInterest(minion);
+        }
+
+        Refresh();
+    }
+
+    private void ResetInterest()
+    {
+        var minion = PickedMinion();
+        if (minion != null)
+        {
+            RewardState.Instance?.TryResetInterest(minion);
+        }
+
+        Refresh();
     }
 
     private void DoSingularity()
@@ -651,7 +747,83 @@ internal sealed class IdleResearchTab : MonoBehaviour
             RefreshSingularity(state);
         }
 
-        RefreshUpgrades(state, paradigm, schools, singularityShown ? SingularityBlockHeight : 0f);
+        var rewardState = RewardState.Instance;
+        var rewardsShown = rewardState != null &&
+                           (state.SingularityCount > 0 || state.CriticalConstant > 0 || rewardState.AttrTickets > 0 ||
+                            rewardState.InterestTickets > 0 || rewardState.TotalAttrSteps > 0);
+        rewardsRoot.SetActive(rewardsShown);
+        var rewardsTop = singularityTop + (singularityShown ? SingularityBlockHeight : 0f);
+        if (rewardsShown)
+        {
+            UiFactory.Place((RectTransform)rewardsRoot.transform, 0f, rewardsTop, 1100f, RewardsBlockHeight);
+            RefreshRewards(state, rewardState);
+        }
+
+        RefreshUpgrades(state, paradigm, schools,
+            (singularityShown ? SingularityBlockHeight : 0f) + (rewardsShown ? RewardsBlockHeight : 0f));
+    }
+
+    private void RefreshRewards(KnowledgeState state, RewardState rewards)
+    {
+        SetText(rewardsTickets, string.Format(STRINGS.UI.REWARDS.TICKETS, rewards.AttrTickets,
+            rewards.InterestTickets, state.CriticalConstant));
+
+        var total = rewards.TotalAttrSteps;
+        SetText(rewardsAttrStatus, total == 0
+            ? STRINGS.UI.REWARDS.ATTR_NONE.text
+            : string.Format(STRINGS.UI.REWARDS.ATTR_STATUS, total, RewardRules.AttrMaxStepsTotal,
+                (total * RewardRules.AttrStep).ToString("0.0")));
+        var list = new List<string>();
+        foreach (var id in RewardEffects.AttributeIds)
+        {
+            if (rewards.AttrSteps(id) > 0)
+            {
+                list.Add(RewardEffects.AttributeName(id) + " +" + rewards.AttrBonus(id).ToString("0.0"));
+            }
+        }
+
+        SetText(rewardsAttrList, string.Join("   ", list));
+        SetText(attrBuyLabel, rewards.AttrAtLimit
+            ? STRINGS.UI.REWARDS.ATTR_MAXED.text
+            : rewards.AttrTickets > 0
+                ? STRINGS.UI.REWARDS.ATTR_BUY_TICKET.text
+                : string.Format(STRINGS.UI.REWARDS.ATTR_BUY_CC, rewards.NextAttrCost));
+        SetInteractable(attrBuyButton, rewards.CanBuyAttr);
+        SetText(attrResetLabel, string.Format(STRINGS.UI.REWARDS.ATTR_RESET, RewardRules.AttrResetCost));
+        SetInteractable(attrResetButton, rewards.CanResetAttr);
+
+        var minion = PickedMinion();
+        var hasMinion = minion != null;
+        SetText(rewardsMinionName, hasMinion ? minion.GetProperName() : STRINGS.UI.REWARDS.INTEREST_NONE.text);
+        if (hasMinion)
+        {
+            var groups = rewards.GrantedGroups(RewardEffects.MinionId(minion));
+            var names = new List<string>();
+            foreach (var group in groups)
+            {
+                var skillGroup = Db.Get().SkillGroups.TryGet(group);
+                names.Add(skillGroup != null ? skillGroup.Name : group);
+            }
+
+            SetText(rewardsInterestStatus, groups.Count == 0
+                ? string.Format(STRINGS.UI.REWARDS.INTEREST_NOTHING, RewardRules.InterestMaxPerMinion)
+                : string.Format(STRINGS.UI.REWARDS.INTEREST_STATUS, string.Join(", ", names), groups.Count,
+                    RewardRules.InterestMaxPerMinion));
+            SetText(interestBuyLabel, rewards.CanGrantInterest(minion) || rewards.GrantCount(RewardEffects.MinionId(minion)) < RewardRules.InterestMaxPerMinion
+                ? (rewards.InterestTickets > 0
+                    ? STRINGS.UI.REWARDS.INTEREST_BUY_TICKET.text
+                    : string.Format(STRINGS.UI.REWARDS.INTEREST_BUY_CC, rewards.NextInterestCost))
+                : STRINGS.UI.REWARDS.INTEREST_FULL.text);
+        }
+        else
+        {
+            SetText(rewardsInterestStatus, "");
+            SetText(interestBuyLabel, "");
+        }
+
+        SetInteractable(interestBuyButton, hasMinion && rewards.CanGrantInterest(minion));
+        SetText(interestResetLabel, string.Format(STRINGS.UI.REWARDS.INTEREST_RESET, RewardRules.InterestResetCost));
+        SetInteractable(interestResetButton, hasMinion && rewards.CanResetInterest(minion));
     }
 
     private static void SetInputText(TMP_InputField field, string text)

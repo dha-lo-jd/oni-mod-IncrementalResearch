@@ -95,6 +95,8 @@ public static class STRINGS
                 "The Observation Net has been expanded far enough to draw up the final facility. The Insight Degeneracy Extraction Furnace (Equipment menu, Research tab) is now available. Build it from steel, glass and ceramic, and keep a rectangle of cells above its base clear of tiles (up to 32 wide and 16 tall; it grows as you expand it). While it runs, it builds up the performance of the Observation Net.";
             public static LocString STAGE13_TITLE = "Singularity";
             public static LocString STAGE13_BODY =
+                "<b>Beyond the End of Knowledge, the Journey Continues</b>\n\n" +
+                "<i>Insight keeps being born. Its accumulation comes to foresee even its own end, and in exchange for everything that came before, it scoops an 'answer' out of the sea of singularity. What that answer answers is uncertain, but that it is useful is beyond doubt. Incidentally, the only Critical Constant confirmed so far is '42'.</i>\n\n\n" +
                 "Everything for a singularity is in sight. Deliver Data Banks to the Record Archive (Duplicants carry them in); the Insight tab shows how many are needed. A singularity resets the idle game and grants Critical Constant (CC), which buys permanent expansions and automation.";
             public static LocString STAGE3_BODY =
                 "You have enough Insight to expand the Record Archive. Select it and use the expand button in its side screen: each expansion raises its production, but the next one costs more.";
@@ -324,6 +326,31 @@ public static class STRINGS
             public static LocString CONFIRM_RESET = "Insight, Meta-Insight, everything bought with them, the paradigm shift count and the facility blueprints are reset.";
             public static LocString CONFIRM_KEEP = "Critical Constant and everything bought with it are kept. Buildings already built stay as they are.";
             public static LocString CONFIRM_OK = "Singularity";
+        }
+
+        public static class REWARDS
+        {
+            public static LocString HEADER = "Rewards";
+            public static LocString TICKETS = "Free draws: attributes {0}, interests {1}    Critical Constant: {2} CC";
+            public static LocString ATTR_STATUS = "Attribute bonus: {0} / {1} draws, +{2} in all";
+            public static LocString ATTR_NONE = "No attribute bonus yet.";
+            public static LocString ATTR_BUY_TICKET = "Attribute bonus (+0.1, random): use a free draw";
+            public static LocString ATTR_BUY_CC = "Attribute bonus (+0.1, random): {0} CC";
+            public static LocString ATTR_MAXED = "Attribute bonus: at the limit";
+            public static LocString ATTR_RESET = "Reset all bonuses ({0} CC)";
+            public static LocString INTEREST_HEADER = "Interests";
+            public static LocString INTEREST_NONE = "There are no Duplicants.";
+            public static LocString INTEREST_STATUS = "Granted: {0} ({1} / {2})";
+            public static LocString INTEREST_NOTHING = "Granted: none (0 / {0})";
+            public static LocString INTEREST_BUY_TICKET = "Grant a random interest: use a free draw";
+            public static LocString INTEREST_BUY_CC = "Grant a random interest: {0} CC";
+            public static LocString INTEREST_FULL = "This Duplicant cannot receive more interests";
+            public static LocString INTEREST_RESET = "Remove granted interests ({0} CC)";
+            public static LocString PREV = "<";
+            public static LocString NEXT = ">";
+            public static LocString MODIFIER_DESC = "Reward from the Incremental Insight Initiative";
+            public static LocString MILESTONE_TITLE = "Paradigm Shift Milestone";
+            public static LocString MILESTONE_BODY = "You have made {0} paradigm shift(s).\n\nReward: {1} free attribute draw(s) and {2} free interest grant(s). Use them in the Rewards box of the Insight tab.";
         }
 
         public static class SCHOOLS

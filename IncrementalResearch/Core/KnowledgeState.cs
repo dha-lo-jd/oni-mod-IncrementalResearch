@@ -109,8 +109,8 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public int CriticalConstant => criticalConstant;
     public int ScaleCcProduction => scaleCcProduction;
     public int ScaleCcMi => scaleCcMi;
-    public double CcProductionMultiplier => Math.Pow(KnowledgeRules.CcProductionStep, scaleCcProduction);
-    public double CcMiGainMultiplier => Math.Pow(KnowledgeRules.CcMiGainStep, scaleCcMi);
+    public double CcProductionMultiplier => KnowledgeRules.CcMultiplier(KnowledgeRules.CcProductionFirst, scaleCcProduction);
+    public double CcMiGainMultiplier => KnowledgeRules.CcMultiplier(KnowledgeRules.CcMiGainFirst, scaleCcMi);
 
     public bool IsTierUnlocked(int tier)
     {
@@ -486,6 +486,17 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         metaInsightEarned += amount;
     }
 
+    public bool TrySpendCriticalConstant(int amount)
+    {
+        if (amount < 0 || criticalConstant < amount)
+        {
+            return false;
+        }
+
+        criticalConstant -= amount;
+        return true;
+    }
+
     public void DebugAddCriticalConstant(int amount)
     {
         criticalConstant += amount;
@@ -559,7 +570,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
     public bool SingularityVisible => unlocked[KnowledgeRules.MaxTier] || singularityCount > 0;
     public int DatabanksRequired => KnowledgeRules.DatabanksRequired(singularityCount);
     public int DatabanksStored => RecordArchive.DatabanksStored;
-    public int NextCcGain => KnowledgeRules.CcGain(singularityCount);
+    public int NextCcGain => KnowledgeRules.CcGain(metaInsightEarned);
 
     private static readonly string[] AutoExpandIds =
     {
@@ -645,6 +656,7 @@ public sealed class KnowledgeState : KMonoBehaviour, ISim200ms
         metaInsight += gain;
         metaInsightEarned += gain;
         shiftCount++;
+        RewardState.Instance?.OnShifted();
         schoolId = SchoolsUnlocked && Schools.Find(newSchoolId) != null ? newSchoolId : "";
 
         for (var tier = 1; tier <= KnowledgeRules.MaxTier; tier++)

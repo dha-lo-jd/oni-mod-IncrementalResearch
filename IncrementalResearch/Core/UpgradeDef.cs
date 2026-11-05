@@ -254,20 +254,20 @@ public static class Upgrades
         {
             Id = AutoShift, Name = STRINGS.UI.UPGRADES.C_AUTO_SHIFT.NAME,
             Description = STRINGS.UI.UPGRADES.C_AUTO_SHIFT.DESC, Currency = UpgradeCurrency.CriticalConstant, Tier = 0,
-            Cost = 2, Effect = UpgradeEffect.AutoShift, Value = 0d, RequiredSingularities = 1,
+            Cost = 10, Effect = UpgradeEffect.AutoShift, Value = 0d, RequiredSingularities = 1,
         },
         new UpgradeDef
         {
             Id = AutoMiUpgrade, Name = STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.NAME,
             Description = STRINGS.UI.UPGRADES.C_AUTO_MI_UPGRADE.DESC, Currency = UpgradeCurrency.CriticalConstant,
-            Tier = 0, Cost = 3, Effect = UpgradeEffect.AutoBuyMetaInsightUpgrades, Value = 0d,
+            Tier = 0, Cost = 15, Effect = UpgradeEffect.AutoBuyMetaInsightUpgrades, Value = 0d,
             RequiredSingularities = 1,
         },
         new UpgradeDef
         {
             Id = AutoExpandCc, Name = STRINGS.UI.UPGRADES.C_AUTO_EXPAND.NAME,
             Description = STRINGS.UI.UPGRADES.C_AUTO_EXPAND.DESC, Currency = UpgradeCurrency.CriticalConstant,
-            Tier = 0, Cost = 3, Effect = UpgradeEffect.AutoExpandCriticalConstant, Value = 0d,
+            Tier = 0, Cost = 15, Effect = UpgradeEffect.AutoExpandCriticalConstant, Value = 0d,
             RequiredSingularities = 1,
         },
     };
