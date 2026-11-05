@@ -63,7 +63,18 @@ U = [
 # Singularity (docs/spec-singularity.md): needs tier 7, TOP_EXP expansions of tier 7 in the current cycle and every
 # automatic expansion. Data Banks are assumed to be delivered. CC buys production x1.15 and MI gain x1.1 expansions.
 TOP_EXP = 45
-CC_PROD, CC_MI, CC_COST0, CC_COSTG = 1.15, 1.1, 2.0, 1.5
+CC_PROD, CC_MI, CC_COST0, CC_COSTG = 1.15, 1.1, 2.0, float(os.environ.get('CCCG', '1.6'))
+# Variant: the first expansions are stronger. Step n multiplies by 1 + a / (1 + n * d); a = 0 keeps the flat CC_PROD/CC_MI.
+CC_A_PROD = float(os.environ.get('CCA_P', '0.7')); CC_A_MI = float(os.environ.get('CCA_M', '0.35')); CC_D = float(os.environ.get('CCD', '0.15'))
+FIXP = float(os.environ.get('FIXP', '0')); FIXM = float(os.environ.get('FIXM', '0'))   # test: hold the CC multipliers fixed
+CC_R = float(os.environ.get('CCR', '0.8'))   # > 0: step n multiplies by 1 + a * R^n, so the total converges
+CC_GAIN_SCALE = float(os.environ.get('CCG', '5'))   # multiplies the Critical Constant gained per singularity
+CC_COST_SCALE = float(os.environ.get('CCC', '1'))   # multiplies the cost of the Critical Constant expansions
+def cc_mult(n, flat, a):
+    if a <= 0: return flat ** n
+    r = 1.0
+    for i in range(n): r *= 1 + (a * CC_R ** i if CC_R > 0 else a / (1 + i * CC_D))
+    return r
 SING_LOG = []   # (hours, singularity number, shifts done in the run, CC gained)
 AUTOS = ['T1_AUTO_EXPAND','T4_AUTO_EXPAND','T5_AUTO_EXPAND','T6_AUTO_EXPAND','T7_AUTO_EXPAND']
 # Tiers 4-7 are draft values (docs/spec-tiers-4-7.md); NT = number of tiers simulated.
@@ -101,7 +112,7 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
         r = 1.0
         for u in U:
             if u[3]=="mul" and (u[1]==tier or u[1]==0) and has(u[0]): r *= u[4]
-        return r * CC_PROD**ccp
+        return r * (FIXP if FIXP else cc_mult(ccp, CC_PROD, CC_A_PROD))
     def growth(tier):
         g = GROW[tier]
         for u in U:
@@ -162,7 +173,7 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
         if os.environ.get('TL') and shifts==0 and int(t)%300==0 and t>0 and int(t)!=getattr(P,'_lt',-1):
             P._lt=int(t); print('t=%5.1fmin T=%.2g know=%.2g P=%.2g ex=%s'%(t/60,T,know,prod,[ex[i] for i in range(1,NT+1)]))
         # shift decision
-        g = int(gain(P, T) * CC_MI**ccm)
+        g = int(gain(P, T) * (FIXM if FIXM else cc_mult(ccm, CC_MI, CC_A_MI)))
         cyc = t-cycle_start
         if g>=1 and g >= max(1, P.rho*max(Mearned, getattr(P,'mmin',0))):
             EVENTS.append((t/3600,'SHIFT%d'%(shifts+1)))
@@ -184,12 +195,14 @@ def run(P, hours=100, dt=2.0, verbose=True, label=""):
             ups = set(u for u in ups if next(x for x in U if x[0]==u)[9])
             b = {i:0.0 for i in range(1,NT+1)}; T=0.0; know=start_know(); cycle_start=t
         if SING and NT>=7 and unl[7] and ex[7]>=TOP_EXP and all(has(a) for a in AUTOS):
-            sings += 1; cc += sings
-            SING_LOG.append((t/3600, sings, shifts, sings))
+            sings += 1
+            gain_cc = max(1, min(10, int(math.floor(math.log10(max(Mearned, 1)))) - 5))   # KnowledgeRules.CcGain
+            gain_cc = int(round(gain_cc * CC_GAIN_SCALE)); cc += gain_cc
+            SING_LOG.append((t/3600, sings, shifts, gain_cc))
             EVENTS.append((t/3600,'SINGULARITY%d'%sings))
             # Spend CC on the cheaper expansion first, as the automation does.
             while True:
-                cp = math.ceil(CC_COST0*CC_COSTG**ccp); cm = math.ceil(CC_COST0*CC_COSTG**ccm)
+                cp = math.ceil(CC_COST0*CC_COST_SCALE*CC_COSTG**ccp); cm = math.ceil(CC_COST0*CC_COST_SCALE*CC_COSTG**ccm)
                 c, kind = (cp, 0) if cp <= cm else (cm, 1)
                 if c > cc - cc_spent: break
                 cc_spent += c
@@ -266,7 +279,7 @@ if __name__=="__main__":
     if SING_LOG:
         prev=0
         for h,n,sh,g in SING_LOG:
-            print('singularity %d at %.2fh (+%.1fh), %d shifts in that run'%(n,h,h-prev,sh)); prev=h
+            print('singularity %d at %.2fh (+%.1fh), %d shifts in that run, +%d CC'%(n,h,h-prev,sh,g)); prev=h
     if os.environ.get('EVENTS'):
         prev=0
         for h,n in EVENTS[:int(os.environ.get('EVENTS'))]:
