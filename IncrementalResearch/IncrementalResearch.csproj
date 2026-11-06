@@ -14,6 +14,12 @@
         <ModInstallPath Condition="'$(ModInstallPath)' == ''">$(ONI_MOD_INSTALL_PATH)</ModInstallPath>
     </PropertyGroup>
 
+    <!-- No pdb in Release builds. -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+
     <ItemGroup>
         <Reference Include="0Harmony">
             <HintPath>$(GameManagedPath)\0Harmony.dll</HintPath>
@@ -76,6 +82,7 @@
         <MakeDir Directories="$(ModInstallPath)" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModInstallPath)" />
         <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModInstallPath)" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+        <Delete Files="$(ModInstallPath)\$(TargetName).pdb" Condition="'$(Configuration)' == 'Release'" />
         <Copy SourceFiles="$(ProjectDir)mod_info.yaml" DestinationFolder="$(ModInstallPath)" Condition="Exists('$(ProjectDir)mod_info.yaml')" />
         <ItemGroup>
             <ModTranslationFiles Include="$(ProjectDir)translations\*.po" />
