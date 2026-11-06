@@ -9,12 +9,12 @@ public sealed class ComputeRoomConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Super Computer's.
+        // Own animation: anim/assets/IRComputeRoom.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             3,
             3,
-            "research_center2_kanim",
+            "IRComputeRoom_kanim",
             30,
             60f,
             new[] { 800f },
@@ -51,12 +51,12 @@ public sealed class VacuumLabConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Orbital Research Station's.
+        // Own animation: anim/assets/IRVacuumLab.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             4,
             4,
-            "research_space_kanim",
+            "IRVacuumLab_kanim",
             30,
             90f,
             new[] { 500f, 500f },
@@ -93,12 +93,12 @@ public sealed class AcceleratorConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Super Computer one.
+        // Own animation: anim/assets/IRAccelerator.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             4,
             3,
-            "research_center2_kanim",
+            "IRAccelerator_kanim",
             30,
             120f,
             new[] { 400f, 200f },
@@ -134,12 +134,12 @@ public sealed class ConfinementConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Orbital Research Station one.
+        // Own animation: anim/assets/IRConfinement.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             4,
             4,
-            "research_space_kanim",
+            "IRConfinement_kanim",
             30,
             120f,
             new[] { 600f, 400f },
@@ -175,12 +175,12 @@ public sealed class ObservationNetConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Research Station one.
+        // Own animation: anim/assets/IRObservationNet.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             5,
             3,
-            "research_center_kanim",
+            "IRObservationNet_kanim",
             30,
             120f,
             new[] { 600f, 300f },
@@ -224,13 +224,13 @@ public sealed class ExtractionFurnaceConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Orbital Research Station one.
+        // Own animation: anim/assets/IRExtractionFurnace.
         // The build menu supports at most three material choices, so plastic is left out.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             5,
             4,
-            "research_space_kanim",
+            "IRExtractionFurnace_kanim",
             30,
             120f,
             new[] { 800f, 400f, 400f },

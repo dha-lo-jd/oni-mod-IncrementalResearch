@@ -10,12 +10,12 @@ public sealed class RecordArchiveConfig : IBuildingConfig
 
     public override BuildingDef CreateBuildingDef()
     {
-        // Placeholder animation: reuses the Super Computer's.
+        // Own animation: anim/assets/IRRecordArchive.
         var def = BuildingTemplates.CreateBuildingDef(
             ID,
             3,
             3,
-            "research_center2_kanim",
+            "IRRecordArchive_kanim",
             30,
             30f,
             BUILDINGS.CONSTRUCTION_MASS_KG.TIER3,

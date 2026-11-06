@@ -83,6 +83,10 @@
         <MakeDir Directories="$(ModInstallPath)\translations" Condition="'@(ModTranslationFiles)' != ''" />
         <Copy SourceFiles="@(ModTranslationFiles)" DestinationFolder="$(ModInstallPath)\translations" Condition="'@(ModTranslationFiles)' != ''" />
         <Copy SourceFiles="$(ProjectDir)mod.yaml" DestinationFolder="$(ModInstallPath)" Condition="Exists('$(ProjectDir)mod.yaml')" />
+        <ItemGroup>
+            <ModAnimFiles Include="$(ProjectDir)anim\**\*" Exclude="$(ProjectDir)anim\**\.gitkeep;$(ProjectDir)anim\README.md" />
+        </ItemGroup>
+        <Copy SourceFiles="@(ModAnimFiles)" DestinationFiles="@(ModAnimFiles->'$(ModInstallPath)\anim\%(RecursiveDir)%(Filename)%(Extension)')" Condition="'@(ModAnimFiles)' != ''" />
     </Target>
 
 </Project>
