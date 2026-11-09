@@ -1082,3 +1082,27 @@ msgstr ""
 "パラダイムシフトを通算{0}回行いました。\n"
 "\n"
 "報酬: 属性ボーナスの無料券{1}枚、興味関心の無料券{2}枚。知見タブの「報酬」の枠で使えます。"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.MODE_LABEL"
+msgid "Main screen readout"
+msgstr "メイン画面の表示"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.MODE_FULL"
+msgid "Full"
+msgstr "標準"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.MODE_COMPACT"
+msgid "Compact"
+msgstr "最小限"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.MODE_ICON"
+msgid "Icon"
+msgstr "アイコン"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.MODE_HIDDEN"
+msgid "Hidden"
+msgstr "非表示"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.TOOLTIP"
+msgid "Click to change the size"
+msgstr "クリックでサイズ変更"

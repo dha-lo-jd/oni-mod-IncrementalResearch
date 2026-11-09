@@ -192,7 +192,8 @@ internal sealed class IdleResearchTab : MonoBehaviour
         scroll.scrollSensitivity = 40f;
         scrollRect = scroll;
 
-        UiFactory.CreateLabel(content, STRINGS.UI.TAB.TITLE, 40f, 30f, 600f, 40f, fontSize: 28f);
+        UiFactory.CreateLabel(content, STRINGS.UI.TAB.TITLE, 40f, 30f, 400f, 40f, fontSize: 28f);
+        BuildHudModeRow(content);
         // Summary card: Insight, its rate and Meta-Insight, in the same colors as the readout on the main screen.
         var card = UiFactory.CreateRect("SummaryCard", content, 30f, 78f, 1020f, 108f);
         card.gameObject.AddComponent<Image>().color = UiFactory.CardColor;
@@ -372,6 +373,39 @@ internal sealed class IdleResearchTab : MonoBehaviour
     }
 
     // Shortcuts for testing, shown only in the game's debug mode. Not translated.
+    // Four buttons to choose how the readout on the main screen looks. The current choice is lit.
+    private readonly List<Image> hudModeImages = new List<Image>();
+
+    private void BuildHudModeRow(RectTransform content)
+    {
+        UiFactory.CreateLabel(content, STRINGS.UI.HUD.MODE_LABEL, 430f, 32f, 190f, 36f, TextAlignmentOptions.MidlineRight);
+        var names = new[]
+        {
+            STRINGS.UI.HUD.MODE_FULL, STRINGS.UI.HUD.MODE_COMPACT, STRINGS.UI.HUD.MODE_ICON, STRINGS.UI.HUD.MODE_HIDDEN
+        };
+        for (var i = 0; i < names.Length; i++)
+        {
+            var mode = (HudMode)i;
+            var button = UiFactory.CreateButton(content, names[i], 630f + i * 106f, 32f, 100f, 36f,
+                () => HudSettings.Mode = mode, out _);
+            hudModeImages.Add(button.GetComponent<Image>());
+        }
+
+        HudSettings.Changed += RefreshHudModeButtons;
+        RefreshHudModeButtons();
+    }
+
+    private void RefreshHudModeButtons()
+    {
+        for (var i = 0; i < hudModeImages.Count; i++)
+        {
+            if (hudModeImages[i] != null)
+            {
+                hudModeImages[i].color = (int)HudSettings.Mode == i ? UiFactory.ActiveButtonColor : UiFactory.ButtonColor;
+            }
+        }
+    }
+
     private void BuildDebugRow(RectTransform content)
     {
         var rect = UiFactory.CreateRect("DebugRow", content, 0f, 0f, 1000f, 44f);

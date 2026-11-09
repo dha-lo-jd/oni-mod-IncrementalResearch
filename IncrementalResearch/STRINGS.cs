@@ -26,6 +26,13 @@ public static class STRINGS
             public static LocString INSIGHT = "<size=55%><color=#9AA6C8>Insight</color></size>  {0}";
             public static LocString RATE = "+{0}/s";
             public static LocString MI = "<size=75%><color=#9AA6C8>MI</color></size>  {0}";
+            public static LocString ICON_GLYPH = "Ⅲ";
+            public static LocString TOOLTIP = "Click to change the size";
+            public static LocString MODE_LABEL = "Main screen readout";
+            public static LocString MODE_FULL = "Full";
+            public static LocString MODE_COMPACT = "Compact";
+            public static LocString MODE_ICON = "Icon";
+            public static LocString MODE_HIDDEN = "Hidden";
         }
 
         public static class SIDE

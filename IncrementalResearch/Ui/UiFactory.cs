@@ -11,6 +11,7 @@ internal static class UiFactory
 {
     public static readonly Color PanelColor = new(0.192f, 0.205f, 0.258f, 1f);
     public static readonly Color ButtonColor = new(0.243f, 0.263f, 0.341f, 1f);
+    public static readonly Color ActiveButtonColor = new(0.42f, 0.36f, 0.16f, 1f);
     public static readonly Color ButtonDisabledColor = new(0.15f, 0.16f, 0.2f, 1f);
     // Colors of the Insight readouts: Insight itself, its rate, and Meta-Insight.
     public static readonly Color InsightColor = new(0.96f, 0.80f, 0.36f, 1f);
