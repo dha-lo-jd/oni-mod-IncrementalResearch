@@ -13,7 +13,6 @@ public sealed class IncrementalResearchMod : UserMod2
     {
         base.OnLoad(harmony);
         modPath = path;
-        harmony.PatchAll(typeof(IncrementalResearchMod).Assembly);
     }
 
     // Registers the strings and overloads them with translations/<language code>.po of the selected language.
