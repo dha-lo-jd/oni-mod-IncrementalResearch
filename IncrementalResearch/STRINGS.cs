@@ -396,6 +396,8 @@ public static class STRINGS
             public static LocString REQUIRE_POWER = "Draws {0} kW while running (grows as it is expanded, up to a limit)";
             public static LocString REQUIRE_BAND = "Needs a clear band {0} cells long, left and right of the facility, as tall as the facility. Blocked cells now: {1}";
             public static LocString REQUIRE_RECT = "Needs a clear area {0} wide and {1} tall, from the base of the facility upward. Blocked cells now: {2}";
+            public static LocString LOCKED_ARCHIVE = "Locked until the whole research tree is complete";
+            public static LocString LOCKED_TIER = "Locked until the facility one tier below is expanded";
             public static LocString BLOCKED_NAME = "Space is blocked";
             public static LocString BLOCKED_TOOLTIP = "Natural solid or built tiles are in the area this facility needs. Its activity is falling.";
             public static LocString TOO_HOT_NAME = "Too hot to compute";

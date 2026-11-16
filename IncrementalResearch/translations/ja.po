@@ -625,6 +625,14 @@ msgctxt "IncrementalResearch.STRINGS.UI.TIERS.REQUIRE_RECT"
 msgid "Needs a clear area {0} wide and {1} tall, from the base of the facility upward. Blocked cells now: {2}"
 msgstr "設備の底面から上へ、幅{0}、高さ{1}の範囲を空ける必要がある。現在の妨げのセル数: {2}"
 
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.LOCKED_ARCHIVE"
+msgid "Locked until the whole research tree is complete"
+msgstr "研究ツリーをすべて完了すると解放される"
+
+msgctxt "IncrementalResearch.STRINGS.UI.TIERS.LOCKED_TIER"
+msgid "Locked until the facility one tier below is expanded"
+msgstr "ひとつ下の段の施設を拡張すると解放される"
+
 msgctxt "IncrementalResearch.STRINGS.UI.TIERS.BLOCKED_NAME"
 msgid "Space is blocked"
 msgstr "スペースが塞がれている"
@@ -1106,3 +1114,7 @@ msgstr "非表示"
 msgctxt "IncrementalResearch.STRINGS.UI.HUD.TOOLTIP"
 msgid "Click to change the size"
 msgstr "クリックでサイズ変更"
+
+msgctxt "IncrementalResearch.STRINGS.UI.HUD.ICON_GLYPH"
+msgid "Ⅲ"
+msgstr "Ⅲ"
