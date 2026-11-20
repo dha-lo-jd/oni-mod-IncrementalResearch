@@ -78,11 +78,10 @@
         <NoWarn>$(NoWarn);MSB3277</NoWarn>
     </PropertyGroup>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(ModInstallPath)' != ''">
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(ModInstallPath)' != '' and '$(Configuration)' != 'Release'">
         <MakeDir Directories="$(ModInstallPath)" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModInstallPath)" />
         <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModInstallPath)" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
-        <Delete Files="$(ModInstallPath)\$(TargetName).pdb" Condition="'$(Configuration)' == 'Release'" />
         <Copy SourceFiles="$(ProjectDir)mod_info.yaml" DestinationFolder="$(ModInstallPath)" Condition="Exists('$(ProjectDir)mod_info.yaml')" />
         <ItemGroup>
             <ModTranslationFiles Include="$(ProjectDir)translations\*.po" />
@@ -94,6 +93,24 @@
             <ModAnimFiles Include="$(ProjectDir)anim\**\*" Exclude="$(ProjectDir)anim\**\.gitkeep;$(ProjectDir)anim\README.md" />
         </ItemGroup>
         <Copy SourceFiles="@(ModAnimFiles)" DestinationFiles="@(ModAnimFiles->'$(ModInstallPath)\anim\%(RecursiveDir)%(Filename)%(Extension)')" Condition="'@(ModAnimFiles)' != ''" />
+    </Target>
+
+    <!-- Release builds produce a clean distribution folder: <repo>\release\IncrementalResearch (git-ignored). -->
+    <Target Name="PackageRelease" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        <PropertyGroup>
+            <ReleaseDir>$(ProjectDir)..\release\$(TargetName)</ReleaseDir>
+        </PropertyGroup>
+        <ItemGroup>
+            <ReleaseTranslationFiles Include="$(ProjectDir)translations\*.po" />
+            <ReleaseAssetFiles Include="$(ProjectDir)anim\**\*" Exclude="$(ProjectDir)anim\**\.gitkeep;$(ProjectDir)anim\README.md" />
+        </ItemGroup>
+        <RemoveDir Directories="$(ReleaseDir)" />
+        <MakeDir Directories="$(ReleaseDir)" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ReleaseDir)" />
+        <Copy SourceFiles="$(ProjectDir)mod.yaml;$(ProjectDir)mod_info.yaml" DestinationFolder="$(ReleaseDir)" />
+        <Copy SourceFiles="$(ProjectDir)..\Workshop\preview.png" DestinationFolder="$(ReleaseDir)" Condition="Exists('$(ProjectDir)..\Workshop\preview.png')" />
+        <Copy SourceFiles="@(ReleaseTranslationFiles)" DestinationFolder="$(ReleaseDir)\translations" Condition="'@(ReleaseTranslationFiles)' != ''" />
+        <Copy SourceFiles="@(ReleaseAssetFiles)" DestinationFiles="@(ReleaseAssetFiles->'$(ReleaseDir)\anim\%(RecursiveDir)%(Filename)%(Extension)')" Condition="'@(ReleaseAssetFiles)' != ''" />
     </Target>
 
 </Project>

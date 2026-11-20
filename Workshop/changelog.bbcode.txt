@@ -1,0 +1,13 @@
+[h1]Changelog / 更新履歴[/h1]
+
+[h2]1.1.0[/h2]
+[b]English[/b]
+[list]
+[*] Updated for the game's U60 update. Requires U60 or later.
+[*] The locked buildings now have their own tooltip in the build menu (fixes a NullReferenceException in PlanScreen.OnSpawn).
+[/list]
+[b]日本語[/b]
+[list]
+[*] ゲームの U60 アップデートに対応しました。ゲームの U60 以降が必要です。
+[*] 未解禁の建物に、建築メニュー用の専用ツールチップを付けました(PlanScreen.OnSpawn の NullReferenceException を修正)。
+[/list]

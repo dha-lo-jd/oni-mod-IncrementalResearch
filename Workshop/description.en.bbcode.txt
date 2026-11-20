@@ -1,0 +1,26 @@
+[h1]Project Ⅲ: Incremental Insight Initiative[/h1]
+
+An end-game idle clicker built on the research tree. Once research is done, your research stations keep working: they turn the colony's research capacity into [b]Insight[/b], which you spend to expand facilities that produce more Insight. Numbers grow in the background while you keep building your base.
+
+[h2]How it works[/h2]
+[list]
+[*] [b]Insight[/b] is produced continuously. The base rate depends on how many Duplicants are researching and how skilled they are.
+[*] [b]Facilities[/b] (Record Archive, Compute Room, Vacuum Lab, Accelerator, Confinement Structure, Observation Net, Extraction Furnace) are new buildings. Unlocking each one means building it and keeping its environment in order — cooling, vacuum, materials, space. If the environment fails, that facility stops.
+[*] [b]Expansions and upgrades[/b] are bought with Insight and stay inside the idle game.
+[*] [b]Paradigm Shift[/b]: reset Insight and expansions to earn [b]Meta-Insight[/b], a multiplier for everything after.
+[*] [b]Singularity[/b]: reset the idle game itself to earn [b]Critical Constants (CC)[/b], used for automation and for a small set of in-game rewards. It asks for Databank deliveries from your colony.
+[/list]
+
+[h2]Design policy[/h2]
+[list]
+[*] Heavy input, thin output: the idle numbers grow exponentially, but what flows back into the base is deliberately tiny and capped (titles, paintings, small perks).
+[*] Notifications stay quiet. Everything is collected on the research screen.
+[*] Resets only touch the idle game's numbers, never your buildings or the world.
+[/list]
+
+[h2]Notes[/h2]
+[list]
+[*] Requires the game's U60 update or later.
+[*] English and Japanese included.
+[*] Source: [url=https://github.com/dha-lo-jd/oni-mod-IncrementalResearch]GitHub[/url]
+[/list]
