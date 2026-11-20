@@ -13,7 +13,7 @@ An end-game idle clicker built on the research tree. Once research is done, your
 
 [h2]Notes[/h2]
 [list]
-[*] Requires the game's U60 update or later.
+[*] Works on both the game's U60 and U59 builds.
 [*] English and Japanese included.
 [*] Source: [url=https://github.com/dha-lo-jd/oni-mod-IncrementalResearch]GitHub[/url]
 [/list]
