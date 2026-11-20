@@ -11,13 +11,6 @@ An end-game idle clicker built on the research tree. Once research is done, your
 [*] [b]Singularity[/b]: reset the idle game itself to earn [b]Critical Constants (CC)[/b], used for automation and for a small set of in-game rewards. It asks for Databank deliveries from your colony.
 [/list]
 
-[h2]Design policy[/h2]
-[list]
-[*] Heavy input, thin output: the idle numbers grow exponentially, but what flows back into the base is deliberately tiny and capped (titles, paintings, small perks).
-[*] Notifications stay quiet. Everything is collected on the research screen.
-[*] Resets only touch the idle game's numbers, never your buildings or the world.
-[/list]
-
 [h2]Notes[/h2]
 [list]
 [*] Requires the game's U60 update or later.
