@@ -2,7 +2,7 @@
 
 Oxygen Not Included mod (work in progress).
 
-Version 1.1.0 — updated for the U60 release of the game; works on both U60 and U59 (build 744825) or later.
+Version 1.1.1 — supports both the U59 and U60 builds of the game (build 744825 or later).
 
 ## Local build setup
 

@@ -1,13 +1,23 @@
 [h1]Changelog / 更新履歴[/h1]
 
+[h2]1.1.1[/h2]
+[b]English[/b]
+[list]
+[*] Now supports both the game's U59 and U60 builds.
+[/list]
+[b]日本語[/b]
+[list]
+[*] ゲームの U59 と U60 の両方に対応しました。
+[/list]
+
 [h2]1.1.0[/h2]
 [b]English[/b]
 [list]
-[*] Updated for the game's U60 update. Works on both U60 and U59.
+[*] Updated for the game's U60 update. Requires U60 or later.
 [*] The locked buildings now have their own tooltip in the build menu (fixes a NullReferenceException in PlanScreen.OnSpawn).
 [/list]
 [b]日本語[/b]
 [list]
-[*] ゲームの U60 アップデートに対応しました。U60 と U59 の両方で動作します。
+[*] ゲームの U60 アップデートに対応しました。ゲームの U60 以降が必要です。
 [*] 未解禁の建物に、建築メニュー用の専用ツールチップを付けました(PlanScreen.OnSpawn の NullReferenceException を修正)。
 [/list]
