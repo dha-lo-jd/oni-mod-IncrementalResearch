@@ -1,0 +1,5 @@
+{
+  "build": ["dotnet build IncrementalResearch/IncrementalResearch.csproj -v q -p:ModInstallPath=F:/_System/Documents/Klei/OxygenNotIncluded/mods/local/IncrementalResearch"],
+  "required_mods": ["IncrementalResearch.Local"],
+  "save": "05 all research.sav"
+}
